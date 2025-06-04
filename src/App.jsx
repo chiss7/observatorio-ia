@@ -27,7 +27,7 @@ function App() {
   };
 
   return (
-    <Router>
+    <Router basename='/observatorio-ia'>
       <div className="font-sans">
         {/* Navigation Menu */}
         <Header />
