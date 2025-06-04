@@ -7,7 +7,7 @@ const HeroSection = () => {
       <div className="container flex xl:flex-row flex-col gap-10 items-center">
         <div className='p-5 max-w-xl flex flex-col gap-3 xl:text-left text-center'>
           <h1 className="text-4xl xl:text-6xl font-bold text-text-dark mb-2">
-            Observatorio de Inteligencia Artificial
+            Observatorio de Inteligencia Artificials
           </h1>
           <p className="xl:text-xl text-text-medium mb-5">
             ¿Te interesa el trabajo del Observatorio de la Inteligencia Artificial
