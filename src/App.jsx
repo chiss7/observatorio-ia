@@ -7,6 +7,7 @@ import UseCasesSection from './components/UseCasesSection';
 import { MonitoringSection } from './components/MonitoringSection';
 import ParticipationSection from './components/ParticipationSection';
 import ResourcesSection from './components/ResourcesSection';
+import DspaceList from './components/DspaceList';
 import HeroSection from './components/HeroSection';
 import BodySection from './components/BodySection';
 import InteractiveMap from './components/InteractiveMap';
@@ -47,6 +48,7 @@ function App() {
           <Route path="/monitoring" element={<MonitoringSection />} />
           <Route path="/participation" element={<ParticipationSection />} />
           <Route path="/resources" element={<ResourcesSection />} />
+          <Route path="/dspace" element={<DspaceList />} />
         </Routes>
       </div>
     </Router>

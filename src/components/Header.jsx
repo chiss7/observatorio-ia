@@ -32,6 +32,10 @@ const links = [
     name: "Recursos",
     path: "/resources",
   },
+  {
+    name: "Publicaciones",
+    path: "/dspace",
+  },
 ];
 
 const Header = () => {
