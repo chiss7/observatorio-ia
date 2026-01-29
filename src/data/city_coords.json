@@ -1,0 +1,198 @@
+{
+  "Guayaquil": {
+    "lat": -2.1900572,
+    "lon": -79.8868669,
+    "display_name": "Guayaquil, Guayas, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 2403848
+  },
+  "Quito": {
+    "lat": -0.2201641,
+    "lon": -78.5123274,
+    "display_name": "Quito, Pichincha, 170130, Ecuador",
+    "osm_type": "node",
+    "osm_id": 58950371
+  },
+  "Milagro": {
+    "lat": -2.1179635,
+    "lon": -79.5552042,
+    "display_name": "Milagro, Guayas, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 109450
+  },
+  "Manta": {
+    "lat": -1.0320064,
+    "lon": -80.8169311,
+    "display_name": "Manta, Manabí, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 112895
+  },
+  "Huaquillas": {
+    "lat": -3.4756231,
+    "lon": -80.184453,
+    "display_name": "Huaquillas, El Oro, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 107900
+  },
+  "Babahoyo": {
+    "lat": -1.8762599,
+    "lon": -79.5068917,
+    "display_name": "Babahoyo, Los Ríos, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 109250
+  },
+  "Cuenca": {
+    "lat": -2.8974072,
+    "lon": -79.0041726,
+    "display_name": "Cuenca, Azuay, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 3693133
+  },
+  "Portoviejo": {
+    "lat": -1.05282,
+    "lon": -80.4534134,
+    "display_name": "Portoviejo, Manabí, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 282078
+  },
+  "Riobamba": {
+    "lat": -1.6716698,
+    "lon": -78.6607421,
+    "display_name": "Riobamba, Chimborazo, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 3728588
+  },
+  "Puyo": {
+    "lat": -1.4854777,
+    "lon": -77.9969666,
+    "display_name": "Puyo, Pastaza, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 2676638
+  },
+  "Machala": {
+    "lat": -3.3148937,
+    "lon": -79.9512804,
+    "display_name": "Machala, El Oro, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 107889
+  },
+  "Tena": {
+    "lat": -0.9438718,
+    "lon": -78.1083981,
+    "display_name": "Tena, Napo, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 114272
+  },
+  "Loja": {
+    "lat": -4.0528506,
+    "lon": -79.8053425,
+    "display_name": "Loja, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 108088
+  },
+  "Chone": {
+    "lat": -0.3828099,
+    "lon": -80.0721599,
+    "display_name": "Chone, Manabí, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 112904
+  },
+  "Ibarra": {
+    "lat": 0.515937,
+    "lon": -78.1329448,
+    "display_name": "Ibarra, Imbabura, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 113983
+  },
+  "Lago Agrio": {
+    "lat": 0.1266266,
+    "lon": -76.7575913,
+    "display_name": "Lago Agrio, Sucumbíos, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 114564
+  },
+  "Ambato": {
+    "lat": -1.2422413,
+    "lon": -78.6287594,
+    "display_name": "Ambato, Tungurahua, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 3736483
+  },
+  "Santo Domingo": {
+    "lat": -0.2546212,
+    "lon": -79.1686724,
+    "display_name": "Santo Domingo de los Tsachilas, Santo Domingo, Santo Domingo de los Tsáchilas, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 287808
+  },
+  "Otavalo": {
+    "lat": 0.2227636,
+    "lon": -78.2454274,
+    "display_name": "Otavalo, Imbabura, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 113981
+  },
+  "Latacunga": {
+    "lat": -0.9340311,
+    "lon": -78.6145758,
+    "display_name": "Latacunga, Cotopaxi, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 3774376
+  },
+  "Esmeraldas": {
+    "lat": 0.7343619,
+    "lon": -79.3858867,
+    "display_name": "Esmeraldas, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 113237
+  },
+  "Shushufindi": {
+    "lat": -0.2885051,
+    "lon": -76.5906945,
+    "display_name": "Shushufindi, Sucumbíos, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 114565
+  },
+  "Salinas": {
+    "lat": -2.2612497,
+    "lon": -80.9237973,
+    "display_name": "Salinas, Santa Elena, 241550, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 109438
+  },
+  "Puerto Ayora": {
+    "lat": -0.7471674,
+    "lon": -90.3134198,
+    "display_name": "Puerto Ayora, Parroquia Bella Vista, Cantón Santa Cruz, Galápagos, Ecuador",
+    "osm_type": "way",
+    "osm_id": 24821672
+  },
+  "Azogues": {
+    "lat": -2.6317291,
+    "lon": -78.7008934,
+    "display_name": "Azogues, Cañar, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 108718
+  },
+  "Playas": {
+    "lat": -2.5937913,
+    "lon": -80.4261454,
+    "display_name": "Playas, Guayas, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 109442
+  },
+  "Samborondón": {
+    "lat": -2.0155653,
+    "lon": -79.7562694,
+    "display_name": "Samborondón, Guayas, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 109451
+  },
+  "Piñas": {
+    "lat": -3.7106809,
+    "lon": -79.7832238,
+    "display_name": "Piñas, El Oro, Ecuador",
+    "osm_type": "relation",
+    "osm_id": 108041
+  }
+}

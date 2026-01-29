@@ -9,6 +9,14 @@ const links = [
     path: "/",
   },
   {
+    name: "Monitoreo",
+    path: "/monitoring",
+  },
+  {
+    name: "Publicaciones",
+    path: "/dspace",
+  },
+  {
     name: "Gobernanza",
     path: "/governance",
   },
@@ -21,20 +29,12 @@ const links = [
     path: "/use-cases",
   },
   {
-    name: "Monitoreo",
-    path: "/monitoring",
-  },
-  {
     name: "Participación",
     path: "/participation",
   },
   {
     name: "Recursos",
     path: "/resources",
-  },
-  {
-    name: "Publicaciones",
-    path: "/dspace",
   },
 ];
 
