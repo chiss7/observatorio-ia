@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { ecuadorProvinces } from './data/ecuadorProvinces';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GovernanceSection from './components/GovernanceSection';
 import EthicsSection from './components/EthicsSection';
@@ -12,7 +11,9 @@ import HeroSection from './components/HeroSection';
 import BodySection from './components/BodySection';
 import InteractiveMap from './components/InteractiveMap';
 import Header from './components/Header';
-
+import Login from './components/Login';
+import Register from './components/Register';          
+import ProtectedRoute from './components/ProtectedRoute'; 
 
 function App() {
   const [provinceData, setProvinceData] = useState(ecuadorProvinces);
@@ -28,13 +29,11 @@ function App() {
   };
 
   return (
-    <Router basename='/observatorio-ia'>
+    <Router>  {/* Sin basename por ahora */}
       <div className="font-sans">
-        {/* Navigation Menu */}
         <Header />
-
-        {/* Routes */}
         <Routes>
+          {/* Rutas públicas */}
           <Route path="/" element={
             <>
               <HeroSection />
@@ -48,11 +47,20 @@ function App() {
           <Route path="/monitoring" element={<MonitoringSection />} />
           <Route path="/participation" element={<ParticipationSection />} />
           <Route path="/resources" element={<ResourcesSection />} />
-          <Route path="/dspace" element={<DspaceList />} />
+
+          {/* Rutas de autenticación */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Rutas protegidas (requieren login) */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dspace" element={<DspaceList />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
         </Routes>
       </div>
     </Router>
   );
 }
 
-export default App
+export default App;
