@@ -10,10 +10,12 @@ import DspaceList from './components/DspaceList';
 import HeroSection from './components/HeroSection';
 import BodySection from './components/BodySection';
 import InteractiveMap from './components/InteractiveMap';
+import AdminDashboard from './components/AdminDashboard';
 import Header from './components/Header';
 import Login from './components/Login';
 import Register from './components/Register';          
 import ProtectedRoute from './components/ProtectedRoute'; 
+import { ecuadorProvinces } from './data/ecuadorProvinces';
 
 function App() {
   const [provinceData, setProvinceData] = useState(ecuadorProvinces);

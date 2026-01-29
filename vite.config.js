@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   assetsInclude: ['**/*.lottie'],
-  base: '/observatorio-ia/',
+  base: '/',
   server: {
     proxy: {
       // proxy /api requests to the backend to avoid CORS in development
