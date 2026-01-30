@@ -1,10 +1,111 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import { Tabs, Tab } from '@mui/material';
 
-const CityMaps = ({ cityMarkers = [], sentimentMarkers = [], ecuadorBounds = [[-5, -90], [2.5, -75]] }) => {
+const CityMaps = ({ cityMarkers: propCityMarkers = [], sentimentMarkers: propSentimentMarkers = [], ecuadorBounds: propEcuadorBounds, metricsData }) => {
   const [tabIndex, setTabIndex] = useState(0);
+  const [cityCoords, setCityCoords] = useState({});
+
+  useEffect(() => {
+    // try to dynamically import city coords JSON; fail gracefully if missing
+    import("../../data/city_coords.json")
+      .then((mod) => {
+        // expect an object: { cityName: [lat, lng], ... } or array of { name, lat, lng }
+        const payload = mod.default || mod;
+        const map = {};
+        if (Array.isArray(payload)) {
+          payload.forEach((c) => {
+            if (
+              c.name &&
+              (c.lat || c.latitude) &&
+              (c.lng || c.lon || c.longitude)
+            ) {
+              map[c.name.toLowerCase()] = [
+                c.lat || c.latitude,
+                c.lng || c.lon || c.longitude,
+              ];
+            }
+          });
+        } else if (typeof payload === "object" && payload !== null) {
+          // assume keys are city names and values are [lat,lng]
+          Object.keys(payload).forEach((k) => {
+            const v = payload[k];
+            if (Array.isArray(v) && v.length >= 2) map[k.toLowerCase()] = v;
+            else if (v && typeof v === "object" && (v.lat || v.latitude)) {
+              map[k.toLowerCase()] = [
+                v.lat || v.latitude,
+                v.lng || v.lon || v.longitude,
+              ];
+            }
+          });
+        }
+        setCityCoords(map);
+      })
+      .catch(() => {
+        setCityCoords({});
+      });
+  }, []);
+
+  // Prepare markers from metricsData.geography.by_city only if props not provided
+  const computedCityMarkers = [];
+  try {
+    const byCity =
+      metricsData &&
+      metricsData.geography &&
+      Array.isArray(metricsData.geography.by_city)
+        ? metricsData.geography.by_city
+        : [];
+
+    byCity.forEach((entry) => {
+      const name = (entry.ciudad || entry.city || "")?.toString();
+      const total = Number(entry.total || entry.count || 0);
+      const avgSent = Number(
+        entry.avg_sentiment ?? entry.avgSentiment ?? entry.avg ?? 0,
+      );
+      const avgEngagement = Number(
+        entry.avg_engagement ?? entry.avg_interaccion ?? 0,
+      );
+      if (!name) return;
+      const coord = cityCoords[name.toLowerCase()];
+      if (coord)
+        computedCityMarkers.push({
+          name,
+          count: total,
+          coord,
+          avg_sentiment: avgSent,
+          avg_engagement: avgEngagement,
+        });
+    });
+  } catch {
+    // ignore
+  }
+
+  // Prepare sentiment markers (computed) only if props not provided
+  const computedSentimentMarkers = [];
+  try {
+    const byCityG =
+      metricsData &&
+      metricsData.geography &&
+      Array.isArray(metricsData.geography.by_city)
+        ? metricsData.geography.by_city
+        : [];
+
+    byCityG.forEach((entry) => {
+      const name = (entry.ciudad || entry.city || "")?.toString();
+      const avg = Number(entry.avg_sentiment ?? entry.avgSentiment ?? 0);
+      if (!name) return;
+      const coord = cityCoords[name.toLowerCase()];
+      if (coord) computedSentimentMarkers.push({ name, avg, coord, entry });
+    });
+  } catch {
+    // ignore
+  }
+
+  const ecuadorBounds = propEcuadorBounds || [
+    [-5.0, -90.5], // Suroeste (sin cambios)
+    [2.5, -75.0], // Noreste (latitud aumentada de 1.5 a 2.0)
+  ];
 
   const radiusFor = (count) => Math.min(40, 4 + Math.sqrt(count) * 1.8);
 
@@ -102,7 +203,7 @@ const CityMaps = ({ cityMarkers = [], sentimentMarkers = [], ecuadorBounds = [[-
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-          {tabIndex === 0 && cityMarkers.map((m, i) => (
+          {tabIndex === 0 && (propCityMarkers.length ? propCityMarkers : computedCityMarkers).map((m, i) => (
             <CircleMarker
               key={`${m.name}-${i}`}
               center={m.coord}
@@ -118,7 +219,7 @@ const CityMaps = ({ cityMarkers = [], sentimentMarkers = [], ecuadorBounds = [[-
             </CircleMarker>
           ))}
 
-          {tabIndex === 1 && sentimentMarkers.map((m, i) => (
+          {tabIndex === 1 && (propSentimentMarkers.length ? propSentimentMarkers : computedSentimentMarkers).map((m, i) => (
             <CircleMarker
               key={`sent-${m.name}-${i}`}
               center={m.coord}
@@ -134,7 +235,7 @@ const CityMaps = ({ cityMarkers = [], sentimentMarkers = [], ecuadorBounds = [[-
             </CircleMarker>
           ))}
 
-          {tabIndex === 2 && cityMarkers.map((m, i) => (
+          {tabIndex === 2 && (propCityMarkers.length ? propCityMarkers : computedCityMarkers).map((m, i) => (
             <CircleMarker
               key={`eng-${m.name}-${i}`}
               center={m.coord}
