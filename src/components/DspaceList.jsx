@@ -158,7 +158,7 @@ export default function DspaceList() {
               <Typography color="error">Ocurrió un error al cargar las publicaciones</Typography>
             )}
 
-            <Grid container spacing={2}>
+            <Grid spacing={2} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               {parsed.items.map((item, idx) => (
                 <Grid item xs={12} sm={6} md={4} key={item.id || idx}>
                   <Card sx={{
