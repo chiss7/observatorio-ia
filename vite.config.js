@@ -6,15 +6,4 @@ export default defineConfig({
   plugins: [react()],
   assetsInclude: ['**/*.lottie'],
   base: '/',
-  server: {
-    proxy: {
-      // proxy /api requests to the backend to avoid CORS in development
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
-  },
 })

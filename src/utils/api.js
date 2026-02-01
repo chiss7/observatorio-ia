@@ -5,7 +5,9 @@ const prodUrl = import.meta.env.VITE_API_AUTH_PROD_URL;
 const mode = import.meta.env.MODE; // 'development' or 'production'
 
 const baseURL = mode === 'production' ? prodUrl : devUrl;
-console.log(import.meta.env.MODE);
+console.log('🔧 Environment:', mode);
+console.log('🔧 VITE_API_AUTH_DEV_URL:', devUrl);
+console.log('🔧 VITE_API_AUTH_PROD_URL:', prodUrl);
 
 const api = axios.create({
   baseURL: baseURL,
