@@ -96,7 +96,10 @@ const CityMaps = ({ cityMarkers: propCityMarkers = [], sentimentMarkers: propSen
       const avg = Number(entry.avg_sentiment ?? entry.avgSentiment ?? 0);
       if (!name) return;
       const coord = cityCoords[name.toLowerCase()];
-      if (coord) computedSentimentMarkers.push({ name, avg, coord, entry });
+      if (coord) {
+        const total = Number(entry.total || entry.count || 0);
+        computedSentimentMarkers.push({ name, avg, coord, entry, count: total });
+      }
     });
   } catch {
     // ignore
@@ -106,6 +109,11 @@ const CityMaps = ({ cityMarkers: propCityMarkers = [], sentimentMarkers: propSen
     [-5.0, -90.5], // Suroeste (sin cambios)
     [2.5, -75.0], // Noreste (latitud aumentada de 1.5 a 2.0)
   ];
+
+  // Only show cities with at least 5 publicaciones
+  const getCountFromMarker = (m) => Number(m.count ?? m.entry?.count ?? m.entry?.total ?? 0);
+  const visibleCityMarkers = (propCityMarkers.length ? propCityMarkers : computedCityMarkers).filter((m) => getCountFromMarker(m) >= 5);
+  const visibleSentimentMarkers = (propSentimentMarkers.length ? propSentimentMarkers : computedSentimentMarkers).filter((m) => getCountFromMarker(m) >= 5);
 
   const radiusFor = (count) => Math.min(40, 4 + Math.sqrt(count) * 1.8);
 
@@ -203,7 +211,7 @@ const CityMaps = ({ cityMarkers: propCityMarkers = [], sentimentMarkers: propSen
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-          {tabIndex === 0 && (propCityMarkers.length ? propCityMarkers : computedCityMarkers).map((m, i) => (
+          {tabIndex === 0 && visibleCityMarkers.map((m, i) => (
             <CircleMarker
               key={`${m.name}-${i}`}
               center={m.coord}
@@ -219,7 +227,7 @@ const CityMaps = ({ cityMarkers: propCityMarkers = [], sentimentMarkers: propSen
             </CircleMarker>
           ))}
 
-          {tabIndex === 1 && (propSentimentMarkers.length ? propSentimentMarkers : computedSentimentMarkers).map((m, i) => (
+          {tabIndex === 1 && visibleSentimentMarkers.map((m, i) => (
             <CircleMarker
               key={`sent-${m.name}-${i}`}
               center={m.coord}
@@ -235,7 +243,7 @@ const CityMaps = ({ cityMarkers: propCityMarkers = [], sentimentMarkers: propSen
             </CircleMarker>
           ))}
 
-          {tabIndex === 2 && (propCityMarkers.length ? propCityMarkers : computedCityMarkers).map((m, i) => (
+          {tabIndex === 2 && visibleCityMarkers.map((m, i) => (
             <CircleMarker
               key={`eng-${m.name}-${i}`}
               center={m.coord}
