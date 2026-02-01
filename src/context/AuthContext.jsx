@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 
 export const AuthContext = createContext();
 
@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       // Validar token llamando a /api/me (recomendado)
-      axios.get('http://localhost:8080/api/me', {
+      api.get('/me', {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then(res => {
@@ -29,13 +29,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/login', credentials);
+      const res = await api.post('/auth/login', credentials);
       const newToken = res.data.token;
       localStorage.setItem('token', newToken);
       setToken(newToken);
 
       // Obtener datos del usuario inmediatamente
-      const meRes = await axios.get('http://localhost:8080/api/me', {
+      const meRes = await api.get('/me', {
         headers: { Authorization: `Bearer ${newToken}` },
       });
       setUser(meRes.data);
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (credentials) => {
     try {
-      await axios.post('http://localhost:8080/api/auth/register', credentials);
+      await api.post('/auth/register', credentials);
       return true;
     } catch (err) {
       console.error('Register error:', err);
