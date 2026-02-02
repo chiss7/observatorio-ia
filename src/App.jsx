@@ -45,6 +45,7 @@ function App() {
           } />
           <Route path="/governance" element={<GovernanceSection />} />
           <Route path="/ethics" element={<EthicsSection />} />
+          <Route path="/dspace" element={<DspaceList />} />
           <Route path="/use-cases" element={<UseCasesSection />} />
           <Route path="/monitoring" element={<MonitoringSection />} />
           <Route path="/participation" element={<ParticipationSection />} />
@@ -56,7 +57,6 @@ function App() {
 
           {/* Rutas protegidas (requieren login) */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dspace" element={<DspaceList />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Route>
         </Routes>
