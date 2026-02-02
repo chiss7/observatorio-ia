@@ -11,6 +11,14 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  // Allow requests to opt-out of adding the Authorization header by
+  // setting a custom request header `x-skip-auth`.
+  if (config && config.headers && config.headers['x-skip-auth']) {
+    // remove the marker so it isn't sent to the backend
+    delete config.headers['x-skip-auth'];
+    return config;
+  }
+
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
