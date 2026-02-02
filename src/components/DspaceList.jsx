@@ -180,16 +180,25 @@ export default function DspaceList() {
                         </Typography>
                       </Box>
 
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        justifyContent="space-between"
+                        alignItems={{ xs: 'flex-start', sm: 'center' }}
+                        spacing={1}
+                      >
                         <Box>
-                          <Stack direction="row" spacing={2} alignItems="center">
+                          <Stack
+                            direction={{ xs: 'column', sm: 'row' }}
+                            spacing={{ xs: 1, sm: 2 }}
+                            alignItems={{ xs: 'flex-start', sm: 'center' }}
+                          >
                             {item.extent ? (
-                              <Box display="flex" alignItems="center">
+                              <Box display="flex" alignItems="center" sx={{ mr: { xs: 0, sm: 2 }, mb: { xs: 0.5, sm: 0 } }}>
                                 <img src={bookImage} alt="book" style={{ width: 24, height: 24, marginRight: 5 }} />
                                 <Typography variant="caption">{item.extent}</Typography>
                               </Box>
                             ) : null}
-                            <Box display="flex" alignItems="center">
+                            <Box display="flex" alignItems="center" sx={{ mt: { xs: 0.5, sm: 0 } }}>
                               <CalendarTodayIcon fontSize="medium" sx={{ mr: 0.5 }} />
                               <Typography variant="caption">Publicado en {item.published_date || '-'}</Typography>
                               {item.pdf_url && (
@@ -201,10 +210,12 @@ export default function DspaceList() {
                                   }}
                                   aria-label="Abrir PDF"
                                   sx={{
-                                    ml: 1,
-                                    p: 0.25,
-                                    transition: 'transform .12s ease',
-                                    '&:hover': { transform: 'scale(1.12)', backgroundColor: 'transparent' },
+                                    ml: 2,
+                                    p: 1,
+                                    bgcolor: '#d2eaff',
+                                    borderRadius: '8px',
+                                    transition: 'transform .12s ease, background-color .12s ease',
+                                    '&:hover': { transform: 'scale(1.12)', backgroundColor: '#b8dbff' },
                                   }}
                                 >
                                   <img src={pdfImage} alt="pdf" style={{ width: 24, height: 24 }} />
@@ -214,7 +225,11 @@ export default function DspaceList() {
                           </Stack>
                         </Box>
 
-                        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          sx={{ flexWrap: 'wrap', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, mt: { xs: 1, sm: 0 } }}
+                        >
                           {(() => {
                             const subjects = Array.isArray(item.subjects) ? item.subjects : [];
                             const visible = subjects.slice(0, 4);
@@ -263,7 +278,7 @@ export default function DspaceList() {
                             );
                           })()}
                         </Stack>
-                      </Box>
+                      </Stack>
                     </CardContent>
                   </Card>
                 </Grid>
