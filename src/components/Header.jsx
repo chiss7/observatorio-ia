@@ -80,12 +80,6 @@ const Header = () => {
               >
                 Iniciar Sesión
               </Link>
-              <Link
-                to="/register"
-                className="px-4 py-2 border border-teal-400 text-teal-400 rounded hover:bg-teal-400 hover:text-white transition"
-              >
-                Registrarse
-              </Link>
             </>
           )}
         </div>
@@ -153,13 +147,6 @@ const Header = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Iniciar Sesión
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-6 py-3 border border-teal-400 text-teal-400 rounded text-center"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Registrarse
                 </Link>
               </>
             )}
