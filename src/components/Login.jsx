@@ -87,13 +87,6 @@ const Login = () => {
             {loading ? 'Cargando...' : 'Iniciar Sesión'}
           </Button>
         </form>
-
-        <Typography variant="body2" align="center" mt={3}>
-          ¿No tienes cuenta?{' '}
-          <Button component={Link} to="/register" color="primary">
-            Regístrate aquí
-          </Button>
-        </Typography>
       </Paper>
     </Box>
   );

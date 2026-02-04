@@ -46,16 +46,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (credentials) => {
-    try {
-      await api.post('/auth/register', credentials);
-      return true;
-    } catch (err) {
-      console.error('Register error:', err);
-      return false;
-    }
-  };
-
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -72,7 +62,6 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated, 
       isAdmin, 
       login, 
-      register, 
       logout, 
       loading 
     }}>

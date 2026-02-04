@@ -12,8 +12,7 @@ import BodySection from './components/BodySection';
 import InteractiveMap from './components/InteractiveMap';
 import AdminDashboard from './components/AdminDashboard';
 import Header from './components/Header';
-import Login from './components/Login';
-import Register from './components/Register';          
+import Login from './components/Login';     
 import ProtectedRoute from './components/ProtectedRoute'; 
 import { ecuadorProvinces } from './data/ecuadorProvinces';
 
@@ -53,7 +52,6 @@ function App() {
 
           {/* Rutas de autenticación */}
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
 
           {/* Rutas protegidas (requieren login) */}
           <Route element={<ProtectedRoute />}>
