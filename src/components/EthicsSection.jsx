@@ -1,59 +1,110 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import { BookOpen, ShieldCheck, Users, GraduationCap } from "lucide-react";
 
-const EthicsSection = () => {
-  const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, staggerChildren: 0.3 },
-    },
-  };
+const containerVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, staggerChildren: 0.2 },
+  },
+};
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -50 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
-  };
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
+const Card = ({ children }) => (
+  <div className="rounded-2xl bg-white shadow-sm hover:shadow-md transition p-6">
+    {children}
+  </div>
+);
+
+export default function EthicsSection() {
   return (
-    <section className="py-12 px-8 bg-gray-100 min-h-screen">
+    <section className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-6">
       <motion.div
-        className="max-w-5xl mx-auto"
+        className="max-w-6xl mx-auto"
         variants={containerVariants}
         initial="hidden"
-        animate="visible"
+        whileInView="visible"
+        viewport={{ once: true }}
       >
         <motion.h2
-          className="text-3xl font-bold text-text-dark mb-6 text-center"
+          className="text-4xl font-bold text-center mb-4"
           variants={itemVariants}
         >
-          Ética y Principios de la Inteligencia Artificial en Ecuador
+          Ética en el Uso de la Inteligencia Artificial en la Educación
         </motion.h2>
 
-        <motion.div className="space-y-6" variants={itemVariants}>
-          <h3 className="text-2xl font-semibold text-text-dark">Principios Éticos</h3>
-          <p className="text-lg text-text-medium">
-            Según publicaciones de UNESCO Quito en mayo de 2025, la IA en Ecuador debe ser inclusiva y no discriminatoria, respetando la diversidad cultural, lingüística y de género. Esto incluye garantizar la equidad en el acceso a la tecnología y priorizar los derechos humanos, como la privacidad y la dignidad.
-          </p>
+        <motion.p
+          className="text-center text-lg text-gray-600 max-w-3xl mx-auto mb-12"
+          variants={itemVariants}
+        >
+          La Inteligencia Artificial en educación debe usarse de forma
+          responsable, garantizando equidad, privacidad, transparencia y el
+          rol central del ser humano en los procesos de aprendizaje.
+        </motion.p>
 
-          <h3 className="text-2xl font-semibold text-text-dark">Preocupaciones Éticas</h3>
-          <p className="text-lg text-text-medium">
-            Un tema crítico es el uso de deepfakes en campañas electorales, como se observó en 2025, lo que plantea riesgos de manipulación electoral. Además, existe preocupación por la discriminación algorítmica, especialmente en comunidades marginadas, donde la IA podría perpetuar desigualdades si no se regula adecuadamente.
-          </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <motion.div variants={itemVariants}>
+            <Card>
+              <ShieldCheck className="h-8 w-8 text-blue-600 mb-3" />
+              <h3 className="text-xl font-semibold mb-2">
+                Privacidad y Protección de Datos
+              </h3>
+              <p className="text-gray-600">
+                Las herramientas de IA educativa deben cumplir normativas de
+                protección de datos, evitando el uso indebido de información
+                personal de estudiantes y docentes.
+              </p>
+            </Card>
+          </motion.div>
 
-          <h3 className="text-2xl font-semibold text-text-dark">Iniciativas</h3>
-          <p className="text-lg text-text-medium">
-            UNESCO y FLACSO han promovido la adopción de principios éticos basados en la Recomendación sobre la Ética de la IA de UNESCO. Esto incluye la transparencia en el uso de la IA, la rendición de cuentas y la participación humana en decisiones críticas.
-          </p>
+          <motion.div variants={itemVariants}>
+            <Card>
+              <Users className="h-8 w-8 text-blue-600 mb-3" />
+              <h3 className="text-xl font-semibold mb-2">
+                Equidad y No Discriminación
+              </h3>
+              <p className="text-gray-600">
+                Los algoritmos pueden amplificar sesgos existentes. Es clave
+                garantizar que la IA no afecte negativamente a grupos
+                vulnerables ni condicione evaluaciones académicas.
+              </p>
+            </Card>
+          </motion.div>
 
-          <h3 className="text-2xl font-semibold text-text-dark">Recomendaciones</h3>
-          <p className="text-lg text-text-medium">
-            Es fundamental que Ecuador ratifique instrumentos internacionales como el Convenio Marco de IA del Consejo de Europa, que promueve un uso ético de la IA. Además, las universidades deben incluir en sus currículums materias sobre derecho digital y gobernanza digital para formar profesionales conscientes de los desafíos éticos de la IA.
-          </p>
-        </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card>
+              <BookOpen className="h-8 w-8 text-blue-600 mb-3" />
+              <h3 className="text-xl font-semibold mb-2">
+                Transparencia Académica
+              </h3>
+              <p className="text-gray-600">
+                Estudiantes y docentes deben saber cuándo se utiliza IA,
+                con qué propósito y cuáles son sus límites en el proceso
+                educativo.
+              </p>
+            </Card>
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <Card>
+              <GraduationCap className="h-8 w-8 text-blue-600 mb-3" />
+              <h3 className="text-xl font-semibold mb-2">
+                Rol del Docente
+              </h3>
+              <p className="text-gray-600">
+                La IA debe complementar la labor docente, no reemplazarla.
+                El pensamiento crítico y la ética digital siguen siendo
+                responsabilidad humana.
+              </p>
+            </Card>
+          </motion.div>
+        </div>
       </motion.div>
     </section>
   );
 }
-
-export default EthicsSection
