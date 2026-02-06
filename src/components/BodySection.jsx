@@ -1,62 +1,82 @@
 import { motion } from 'framer-motion';
+import { Card, CardContent, Typography, Button, Grid } from '@mui/material';
+import Timeline from '@mui/lab/Timeline'; // Agrega @mui/lab si no lo tienes (npm i @mui/lab)
+import TimelineItem from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import BookIcon from '@mui/icons-material/Book';
 
 const BodySection = () => {
-  const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        staggerChildren: 0.3,
-      },
-    },
-  };
+  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.2 } } };
+  const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -50 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.5 },
-    },
-  };
+  const stats = [
+    { title: "Puesto en Preparación IA", value: "104/188", source: "Oxford Insights 2024" },
+    { title: "Comprensión Ciudadana", value: "71%", source: "Ipsos 2024" },
+    { title: "Metas Digitales 2030", value: "70% trámites", source: "MINTEL 2024" },
+  ];
+
+  const timelineData = [
+    { year: 2024, title: "Política Transformación Digital", desc: "MINTEL establece metas para 2030." },
+    { year: 2024, title: "Proyecto de Ley IA", desc: "Presentado en Asamblea, inspirado en AI Act UE." },
+    { year: 2025, title: "Evaluación AIRA", desc: "PNUD + MINTEL evalúan preparación ética." },
+  ];
 
   return (
-    <section className="py-12 px-8 bg-gray-100">
-      <motion.div
-        className="max-w-5xl mx-auto"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.h2
-          className="text-3xl font-bold text-text-dark mb-6 text-center"
-          variants={itemVariants}
-        >
-          Políticas y Gobernanza de la Inteligencia Artificial en Ecuador
+    <section id="intro" className="py-12 px-8 bg-gray-100">
+      <motion.div className="max-w-5xl mx-auto" variants={containerVariants} initial="hidden" animate="visible">
+        <motion.h2 variants={itemVariants} className="text-3xl font-bold text-text-dark mb-8 text-center">
+          Descubre la IA en Ecuador: Avances y Oportunidades
         </motion.h2>
 
-        <motion.div className="space-y-6" variants={itemVariants}>
-          <p className="text-lg text-text-medium">
-            Ecuador está dando pasos iniciales hacia la adopción y regulación de la Inteligencia Artificial (IA), pero aún enfrenta retos significativos. En 2024, se presentó el "Proyecto de Ley Orgánica de Regulación y Promoción de la Inteligencia Artificial" en la Asamblea Nacional, inspirado en el AI Act de la Unión Europea. Este proyecto busca crear un marco regulatorio ético que priorice los derechos humanos, la privacidad y la no discriminación, clasificando los sistemas de IA según su nivel de riesgo (bajo, moderado, alto y extremo).
-          </p>
+        {/* Stats Infografía */}
+        <Grid container spacing={4} sx={{ mb: 8 }}>
+          {stats.map((stat, idx) => (
+            <Grid item xs={12} md={4} key={idx}>
+              <motion.div variants={itemVariants}>
+                <Card sx={{ p: 4, textAlign: 'center', boxShadow: 3 }}>
+                  <Typography variant="h3" color="pink-accent">{stat.value}</Typography>
+                  <Typography variant="h6">{stat.title}</Typography>
+                  <Typography variant="body2" color="text.secondary">{stat.source}</Typography>
+                  <Button sx={{ mt: 2 }} variant="outlined" size="small">Ver fuente</Button>
+                </Card>
+              </motion.div>
+            </Grid>
+          ))}
+        </Grid>
 
-          <p className="text-lg text-text-medium">
-            En términos de gobernanza, el Ministerio de Telecomunicaciones y de la Sociedad de la Información (MINTEL) ha liderado esfuerzos, como la política pública de transformación digital emitida en abril de 2024, que establece metas ambiciosas para 2030, como la digitalización total de trámites en el 70% de las entidades de la Función Ejecutiva. Sin embargo, la falta de una ley específica sobre IA y un enfoque centralizado del Estado han limitado la participación de la academia y el sector privado en la co-producción de políticas.
-          </p>
+        {/* Timeline */}
+        <motion.h3 variants={itemVariants} className="text-2xl font-bold text-text-dark mb-4 text-center">
+          Cronología de Avances
+        </motion.h3>
+        <Timeline position="alternate">
+          {timelineData.map((item, idx) => (
+            <motion.div variants={itemVariants} key={idx}>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="primary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <Typography variant="h6">{item.year} - {item.title}</Typography>
+                  <Typography>{item.desc}</Typography>
+                </TimelineContent>
+              </TimelineItem>
+            </motion.div>
+          ))}
+        </Timeline>
 
-          <p className="text-lg text-text-medium">
-            El Programa de las Naciones Unidas para el Desarrollo (PNUD) ha colaborado con MINTEL para implementar la metodología AIRA, que evalúa la preparación del país para adoptar IA de manera ética e inclusiva. A pesar de estos avances, un estudio de Oxford Insights de 2024 posicionó a Ecuador en el puesto 104 de 188 países en preparación para implementar IA en el sector público, destacando limitaciones en infraestructura tecnológica y marcos regulatorios.
-          </p>
-
-          <p className="text-lg text-text-medium">
-            En la práctica, la IA ya se usa en sectores como la salud (el IESS utiliza un sistema de diagnóstico con IA donado por Huawei) y la banca (asistentes virtuales como Ada del Banco de Guayaquil). Sin embargo, la gobernanza colaborativa sigue siendo un desafío, y es crucial que Ecuador desarrolle una Estrategia de IA como política de Estado para garantizar su implementación sostenible y equitativa.
-          </p>
+        {/* CTA */}
+        <motion.div variants={itemVariants} className="text-center mt-8">
+          <Button variant="contained" sx={{ bgcolor: 'pink-accent' }} endIcon={<BookIcon />}>
+            Descargar Reporte Completo
+          </Button>
         </motion.div>
       </motion.div>
     </section>
   );
-}
+};
 
-export default BodySection
+export default BodySection;
