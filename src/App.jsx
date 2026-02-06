@@ -10,6 +10,9 @@ import DspaceList from './components/DspaceList';
 import HeroSection from './components/HeroSection';
 import BodySection from './components/BodySection';
 import InteractiveMap from './components/InteractiveMap';
+import StatsSection from './components/StatsSection';
+import CTASection from './components/CTASection';
+import HighlightsSection from './components/HighlightsSection';
 import AdminDashboard from './components/AdminDashboard';
 import Header from './components/Header';
 import Login from './components/Login';     
@@ -38,14 +41,14 @@ function App() {
           <Route path="/" element={
             <>
               <HeroSection />
-              <BodySection />
-              <InteractiveMap provinceData={provinceData} updateProvinceData={updateProvinceData} />
+              <StatsSection />
+              <HighlightsSection />
+              <CTASection />
             </>
           } />
           <Route path="/governance" element={<GovernanceSection />} />
           <Route path="/ethics" element={<EthicsSection />} />
           <Route path="/dspace" element={<DspaceList />} />
-          <Route path="/use-cases" element={<UseCasesSection />} />
           <Route path="/monitoring" element={<MonitoringSection />} />
           <Route path="/participation" element={<ParticipationSection />} />
           <Route path="/resources" element={<ResourcesSection />} />
