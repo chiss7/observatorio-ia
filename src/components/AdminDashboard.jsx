@@ -196,7 +196,6 @@ const AdminDashboard = () => {
                   onChange={(e) => setSubjectInput(e.target.value)}
                   size="small"
                   sx={{ flex: 1 }}
-                  required
                 />
                 <Button variant="outlined" onClick={handleAddSubject}>Agregar</Button>
               </Stack>
@@ -214,7 +213,6 @@ const AdminDashboard = () => {
                   onChange={(e) => setContributorName(e.target.value)}
                   size="small"
                   sx={{ flex: 1 }}
-                  required
                 />
                 <FormControl size="small" sx={{ minWidth: 140 }}>
                   <InputLabel id="role-label">Rol</InputLabel>
