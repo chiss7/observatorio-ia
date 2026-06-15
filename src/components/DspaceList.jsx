@@ -34,8 +34,8 @@ import ArticleIcon from '@mui/icons-material/Article';
 import CategoryIcon from '@mui/icons-material/Category';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import pdfImage from '../assets/pdf.png';
-import bookImage from '../assets/open-book.png';
 
 const publisherStyles = {
   'Universidad Central del Ecuador': { color: '#0F467E', bg: '#E3EEF8' },
@@ -46,6 +46,15 @@ const publisherStyles = {
 
 function getPublisherStyle(publisher) {
   return publisherStyles[publisher] || { color: '#4F4F4F', bg: '#F0F0F0' };
+}
+
+const entityTypeLabels = {
+  Publication: 'Tesis',
+  JournalArticle: 'Artículo de revista',
+};
+
+function getEntityTypeLabel(value) {
+  return entityTypeLabels[value] || value;
 }
 
 function formatDate(dateStr) {
@@ -163,7 +172,7 @@ export default function DspaceList() {
   if (searchTerm) activeChips.push({ id: 'search', label: `${fieldLabels[searchField]}: ${searchTerm}` });
   if (publisher) activeChips.push({ id: 'publisher', label: `Universidad: ${publisher}` });
   if (journalName) activeChips.push({ id: 'journal', label: `Revista: ${journalName}` });
-  if (entityType) activeChips.push({ id: 'type', label: `Tipo: ${entityType}` });
+  if (entityType) activeChips.push({ id: 'type', label: `Tipo: ${getEntityTypeLabel(entityType)}` });
   if (dateFrom) activeChips.push({ id: 'dateFrom', label: `Desde: ${dateFrom}` });
   if (dateTo) activeChips.push({ id: 'dateTo', label: `Hasta: ${dateTo}` });
 
@@ -179,8 +188,14 @@ export default function DspaceList() {
           className="text-3xl font-bold text-text-dark mb-6 text-center"
           variants={itemVariants}
         >
-          Publicaciones UCE DSpace
+          Publicaciones sobre Inteligencia Artificial
         </motion.h2>
+        <motion.p
+          className="text-gray-500 text-center -mt-4 mb-6"
+          variants={itemVariants}
+        >
+          Investigaciones y artículos académicos de universidades ecuatorianas
+        </motion.p>
         <motion.div variants={itemVariants}>
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 4 }}>
@@ -278,7 +293,7 @@ export default function DspaceList() {
                       [
                         <MenuItem key="all" value="">Todos</MenuItem>,
                         ...filterOptions.entity_type.map((opt) => (
-                          <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                          <MenuItem key={opt} value={opt}>{getEntityTypeLabel(opt)}</MenuItem>
                         ))
                       ]
                     )}
@@ -342,11 +357,8 @@ export default function DspaceList() {
 
             <Grid size={{ xs: 12, md: 8 }}>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6" fontWeight={600}>
-                  Publicaciones
-                </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Total: {parsed.total ?? 0}
+                  Mostrando <strong>{parsed.total ?? 0}</strong> publicaciones
                 </Typography>
               </Box>
 
@@ -370,19 +382,27 @@ export default function DspaceList() {
                     if (item.source_url) window.open(item.source_url, '_blank', 'noopener,noreferrer');
                   }}>
                     <Box component="section" mb={3}>
-                      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" mb={1}>
-                        {item.publisher && (() => {
-                          const style = getPublisherStyle(item.publisher);
-                          return (
-                            <Typography variant="caption" sx={{ color: style.color, backgroundColor: style.bg, px: 1.5, py: 0.5, borderRadius: '12px', display: 'inline-block', fontWeight: 600 }}>
-                              {item.publisher}
-                            </Typography>
-                          );
-                        })()}
-                        <Box display="flex" alignItems="center">
-                          <CalendarTodayIcon fontSize="small" sx={{ mr: 0.5, fontSize: 14 }} />
-                          <Typography variant="caption">{formatDate(item.published_date)}</Typography>
-                        </Box>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+                        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                          {item.publisher && (() => {
+                            const style = getPublisherStyle(item.publisher);
+                            return (
+                              <Typography variant="caption" sx={{ color: style.color, backgroundColor: style.bg, px: 1.5, py: 0.5, borderRadius: '12px', display: 'inline-block', fontWeight: 600 }}>
+                                {item.publisher}
+                              </Typography>
+                            );
+                          })()}
+                          <Box display="flex" alignItems="center">
+                            <CalendarTodayIcon fontSize="small" sx={{ mr: 0.5, fontSize: 14 }} />
+                            <Typography variant="caption">{formatDate(item.published_date)}</Typography>
+                          </Box>
+                        </Stack>
+                        {item.entity_type && (
+                          <Box display="flex" alignItems="center" flexShrink={0}>
+                            <FormatQuoteIcon fontSize="small" sx={{ mr: 0.5, fontSize: 16 }} />
+                            <Typography variant="caption" fontWeight={600}>{getEntityTypeLabel(item.entity_type)}</Typography>
+                          </Box>
+                        )}
                       </Stack>
                       <Typography variant="h6" mb={1}>{item.title || item.name || 'Sin título'}</Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -401,52 +421,11 @@ export default function DspaceList() {
                       alignItems={{ xs: 'flex-start', sm: 'center' }}
                       spacing={1}
                     >
-                      <Box>
-                        <Stack
-                          direction={{ xs: 'column', sm: 'row' }}
-                          spacing={{ xs: 1, sm: 2 }}
-                          alignItems={{ xs: 'flex-start', sm: 'center' }}
-                        >
-                          {item.extent ? (
-                            <Box display="flex" alignItems="center" sx={{ mr: { xs: 0, sm: 2 }, mb: { xs: 0.5, sm: 0 } }}>
-                              <img src={bookImage} alt="book" style={{ width: 24, height: 24, marginRight: 5 }} />
-                              <Typography variant="caption">{item.extent}</Typography>
-                            </Box>
-                          ) : null}
-                          {item.pdf_url && (
-                            <Box display="flex" alignItems="center" sx={{ mt: { xs: 0.5, sm: 0 } }}>
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  window.open(item.pdf_url, '_blank', 'noopener,noreferrer');
-                                }}
-                                aria-label="Abrir PDF"
-                                sx={{
-                                  ml: 2,
-                                  p: 1,
-                                  bgcolor: '#d2eaff',
-                                  borderRadius: '8px',
-                                  transition: 'transform .12s ease, background-color .12s ease',
-                                  '&:hover': { transform: 'scale(1.12)', backgroundColor: '#b8dbff' },
-                                }}
-                              >
-                                <img src={pdfImage} alt="pdf" style={{ width: 24, height: 24 }} />
-                              </IconButton>
-                            </Box>
-                          )}
-                        </Stack>
-                      </Box>
-
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        sx={{ flexWrap: 'wrap', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, mt: { xs: 1, sm: 0 } }}
-                      >
+                      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
                         {(() => {
                           const subjects = Array.isArray(item.subjects) ? item.subjects : [];
-                          const visible = subjects.slice(0, 4);
-                          const extra = subjects.length > 4 ? subjects.length - 4 : 0;
+                          const visible = subjects.slice(0, 2);
+                          const extra = subjects.length > 2 ? subjects.length - 2 : 0;
                           return (
                             <>
                               {visible.map((s) => (
@@ -461,7 +440,7 @@ export default function DspaceList() {
                                 <Tooltip
                                   title={
                                     <Box sx={{ py: 0.25 }}>
-                                      {subjects.slice(4).map((s) => (
+                                      {subjects.slice(2).map((s) => (
                                         <Typography key={s.id || s.name} variant="caption" display="block">
                                           {s.name}
                                         </Typography>
@@ -491,6 +470,28 @@ export default function DspaceList() {
                           );
                         })()}
                       </Stack>
+
+                      {item.pdf_url && (
+                        <Box display="flex" alignItems="center">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(item.pdf_url, '_blank', 'noopener,noreferrer');
+                            }}
+                            aria-label="Abrir PDF"
+                            sx={{
+                              p: 1,
+                              bgcolor: '#d2eaff',
+                              borderRadius: '8px',
+                              transition: 'transform .12s ease, background-color .12s ease',
+                              '&:hover': { transform: 'scale(1.12)', backgroundColor: '#b8dbff' },
+                            }}
+                          >
+                            <img src={pdfImage} alt="pdf" style={{ width: 24, height: 24 }} />
+                          </IconButton>
+                        </Box>
+                      )}
                     </Stack>
                   </CardContent>
                 </Card>
