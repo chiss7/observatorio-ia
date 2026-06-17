@@ -25,6 +25,7 @@ const AdminDashboard = () => {
   const [form, setForm] = useState({ title: '', summary: '', source_url: '', subjects: [], contributors: [] });
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingScrape, setLoadingScrape] = useState(false);
+  const [loadingScrapeJournals, setLoadingScrapeJournals] = useState(false);
   const [subjectInput, setSubjectInput] = useState('');
   const [contributorName, setContributorName] = useState('');
   const [contributorRole, setContributorRole] = useState('author');
@@ -155,6 +156,32 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleTriggerScrapeJournals = async () => {
+    setLoadingScrapeJournals(true);
+    try {
+      const res = await api.post('/publications/trigger-scrape-journals');
+      const backResponse = res?.data;
+      const load = extractLoadPublicationsResponse(backResponse);
+      if (load) {
+        if (String(load.status).toLowerCase() === 'ok') {
+          if (load.saved === 0) {
+            toast.info('No se encontró una nueva publicación de revistas');
+          } else {
+            toast.success(`Se guardaron ${load.saved} publicaciones`);
+          }
+        } else {
+          toast.error('Error en scraping: ' + (backResponse?.messages?.join?.(', ') || 'status no OK'));
+        }
+      } else {
+        toast.error('Respuesta inválida del servidor');
+      }
+    } catch (err) {
+      toast.error('Error al disparar scraping de revistas');
+    } finally {
+      setLoadingScrapeJournals(false);
+    }
+  };
+
   return (
     <section className="py-12 px-8 bg-gray-100 min-h-screen">
       <Box sx={{ maxWidth: 600, mx: 'auto' }}>
@@ -267,15 +294,26 @@ const AdminDashboard = () => {
           <Typography variant="h6" gutterBottom>
             Disparar Scraping Automático
           </Typography>
-          <Button
-            variant="contained"
-            color="secondary"
-            fullWidth
-            onClick={handleTriggerScrape}
-            disabled={loadingScrape}
-          >
-            {loadingScrape ? <CircularProgress size={24} /> : 'Iniciar Scraping UCE'}
-          </Button>
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="contained"
+              color="secondary"
+              fullWidth
+              onClick={handleTriggerScrape}
+              disabled={loadingScrape}
+            >
+              {loadingScrape ? <CircularProgress size={24} /> : 'Extraer publicaciones de Dspace'}
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              fullWidth
+              onClick={handleTriggerScrapeJournals}
+              disabled={loadingScrapeJournals}
+            >
+              {loadingScrapeJournals ? <CircularProgress size={24} /> : 'Extraer publicaciones de revistas'}
+            </Button>
+          </Stack>
         </Paper>
 
         <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
