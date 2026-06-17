@@ -44,4 +44,14 @@ export async function getSocialMediaMetrics() {
   }
 }
 
-export default { getDspaceInfo, getSocialMediaMetrics };
+export async function getFilterOptions() {
+  try {
+    const { data } = await api.get('/publications/filter-options');
+    return data;
+  } catch (error) {
+    console.error('Filter options API error:', error);
+    return { publisher: [], entity_type: [], journal_name: [] };
+  }
+}
+
+export default { getDspaceInfo, getSocialMediaMetrics, getFilterOptions };
