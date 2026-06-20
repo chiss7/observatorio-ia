@@ -22,7 +22,7 @@ import { extractLoadPublicationsResponse } from '../models/publication/LoadPubli
 
 const AdminDashboard = () => {
   const { user, isAdmin } = useContext(AuthContext);
-  const [form, setForm] = useState({ title: '', summary: '', source_url: '', subjects: [], contributors: [] });
+  const [form, setForm] = useState({ title: '', summary: '', source_url: '', type: 'AcademicPublication', subjects: [], contributors: [] });
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingScrape, setLoadingScrape] = useState(false);
   const [loadingScrapeJournals, setLoadingScrapeJournals] = useState(false);
@@ -83,6 +83,11 @@ const AdminDashboard = () => {
       setLoadingCreate(false);
       return;
     }
+    if (!form.type?.trim()) {
+      toast.error('El tipo de publicación es obligatorio');
+      setLoadingCreate(false);
+      return;
+    }
     if (!form.subjects || form.subjects.length === 0) {
       toast.error('Agrega al menos un subject');
       setLoadingCreate(false);
@@ -103,6 +108,7 @@ const AdminDashboard = () => {
       const payload = {
         title: form.title,
         abstract: form.summary,
+        type: form.type,
         subjects: form.subjects,
         contributors: form.contributors,
       };
@@ -214,6 +220,19 @@ const AdminDashboard = () => {
               onChange={handleChange}
               required
             />
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel id="type-label">Tipo de publicación</InputLabel>
+              <Select
+                labelId="type-label"
+                name="type"
+                value={form.type}
+                label="Tipo de publicación"
+                onChange={handleChange}
+              >
+                <MenuItem value="AcademicPublication">Publicación Académica</MenuItem>
+                <MenuItem value="Publication">Tesis</MenuItem>
+              </Select>
+            </FormControl>
             <Stack direction="column" spacing={1} sx={{ mt: 1 }}>
               <Typography variant="subtitle1">Temas</Typography>
               <Stack direction="row" spacing={1}>
@@ -281,6 +300,7 @@ const AdminDashboard = () => {
                 !file ||
                 !form.title?.trim() ||
                 !form.summary?.trim() ||
+                !form.type?.trim() ||
                 form.subjects.length === 0 ||
                 form.contributors.length === 0
               }

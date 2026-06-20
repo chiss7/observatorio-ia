@@ -51,6 +51,7 @@ function getPublisherStyle(publisher) {
 const entityTypeLabels = {
   Publication: 'Tesis',
   JournalArticle: 'Artículo de revista',
+  AcademicPublication: 'Publicación Académica',
 };
 
 function getEntityTypeLabel(value) {
