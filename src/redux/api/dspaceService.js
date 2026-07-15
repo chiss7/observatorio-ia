@@ -44,6 +44,24 @@ export async function getSocialMediaMetrics() {
   }
 }
 
+export async function getAIPublicationStats() {
+  try {
+    const { data } = await api.get('/publications/ai-stats');
+    return data;
+  } catch (error) {
+    if (error && error.response) {
+      console.error('AI Stats API error response:', {
+        status: error.response.status,
+        headers: error.response.headers,
+        data: error.response.data,
+      });
+      throw error.response.data || { message: 'Server error', status: error.response.status };
+    }
+    console.error('AI Stats API error:', error);
+    throw error;
+  }
+}
+
 export async function getFilterOptions() {
   try {
     const { data } = await api.get('/publications/filter-options');
