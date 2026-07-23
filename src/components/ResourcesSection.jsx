@@ -1,7 +1,5 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
-const resources = [
+/*const resources = [
   {
     id: 1,
     type: "video",
@@ -58,16 +56,44 @@ const resources = [
   },
 ];
 
-const filters = ["todos", "video", "pdf", "link"];
+const filters = ["todos", "video", "pdf", "link"];*/
+
+
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import api from '../utils/api';
+
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return url;
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+};
 
 const ResourcesSection = () => {
+  const [resources, setResources] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("todos");
   const [activeResource, setActiveResource] = useState(null);
 
-  const filteredResources =
-    activeFilter === "todos"
-      ? resources
-      : resources.filter((r) => r.type === activeFilter);
+  // Cargar recursos desde el backend
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const res = await api.get('/resources');
+        setResources(res.data.data || res.data);
+      } catch (err) {
+        console.error("Error cargando recursos:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResources();
+  }, []);
+
+  const filteredResources = activeFilter === "todos"
+    ? resources
+    : resources.filter(r => r.type === activeFilter);
 
   return (
     <section className="py-16 px-6 bg-gray-100 min-h-screen">
@@ -81,9 +107,9 @@ const ResourcesSection = () => {
           Recursos sobre Inteligencia Artificial
         </motion.h2>
 
-        {/* FILTROS */}
+        {/* Filtros */}
         <div className="flex justify-center gap-4 mb-10 flex-wrap">
-          {filters.map((filter) => (
+          {["todos", "video", "pdf", "link"].map((filter) => (
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
@@ -98,7 +124,7 @@ const ResourcesSection = () => {
           ))}
         </div>
 
-        {/* GRID */}
+        {/* Lista de Recursos */}
         <motion.div
           layout
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -115,31 +141,33 @@ const ResourcesSection = () => {
                 onClick={() =>
                   resource.type === "video"
                     ? setActiveResource(resource)
-                    : window.open(resource.link, "_blank")
+                    : window.open(resource.url, "_blank")
                 }
               >
                 <div className="mb-3 text-sm font-semibold text-blue-600">
                   {resource.type.toUpperCase()}
                 </div>
 
-                <h3 className="text-lg font-bold mb-2">
-                  {resource.title}
-                </h3>
+                <h3 className="text-lg font-bold mb-2">{resource.title}</h3>
+                <p className="text-gray-600 text-sm mb-4">{resource.description}</p>
 
-                <p className="text-gray-600 text-sm mb-4">
-                  {resource.description}
-                </p>
-
-                <span className="text-xs text-gray-500">
-                  Fuente: {resource.source}
-                </span>
+                {resource.source && (
+                  <span className="text-xs text-gray-500">
+                    Fuente: {resource.source}
+                  </span>
+                )}
               </motion.div>
             ))}
           </AnimatePresence>
         </motion.div>
+
+        {loading && <p className="text-center mt-8">Cargando recursos...</p>}
+        {!loading && resources.length === 0 && (
+          <p className="text-center mt-8 text-gray-500">No hay recursos disponibles aún.</p>
+        )}
       </div>
 
-      {/* MODAL VIDEO */}
+      {/* Modal para videos */}
       <AnimatePresence>
         {activeResource && (
           <motion.div
@@ -157,7 +185,7 @@ const ResourcesSection = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <button
-                className="absolute top-3 right-3 text-gray-600 hover:text-black"
+                className="absolute top-3 right-3 text-gray-600 hover:text-black text-2xl"
                 onClick={() => setActiveResource(null)}
               >
                 ✕
@@ -166,21 +194,15 @@ const ResourcesSection = () => {
               <div className="aspect-video w-full rounded-lg overflow-hidden">
                 <iframe
                   className="w-full h-full"
-                  src={activeResource.embed}
+                  src={getYouTubeEmbedUrl(activeResource.url)}
                   title={activeResource.title}
                   frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 />
               </div>
 
-              <h3 className="text-xl font-bold mt-4">
-                {activeResource.title}
-              </h3>
-
-              <p className="text-gray-600 mt-2">
-                {activeResource.description}
-              </p>
+              <h3 className="text-xl font-bold mt-4">{activeResource.title}</h3>
+              <p className="text-gray-600 mt-2">{activeResource.description}</p>
             </motion.div>
           </motion.div>
         )}
