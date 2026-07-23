@@ -401,7 +401,8 @@ const AdminDashboard = () => {
     description: '',
     type: 'video',
     url: '',
-    source: ''
+    source: '',
+    topic: 'GENERAL'
   });
   const [loadingResources, setLoadingResources] = useState(false);
 
@@ -606,7 +607,8 @@ const AdminDashboard = () => {
         description: '',
         type: 'video',
         url: '',
-        source: ''
+        source: '',
+        topic: 'GENERAL'
       });
       fetchResources();
     } catch (err) {
@@ -828,6 +830,19 @@ const AdminDashboard = () => {
                 onChange={(e) => setNewResource({ ...newResource, source: e.target.value })}
               />
 
+              <FormControl fullWidth>
+                <InputLabel>Temática</InputLabel>
+                <Select
+                  value={newResource.topic}
+                  label="Temática"
+                  onChange={(e) => setNewResource({ ...newResource, topic: e.target.value })}
+                >
+                  <MenuItem value="ETHICS">Ética</MenuItem>
+                  <MenuItem value="GOVERNANCE">Gobernanza</MenuItem>
+                  <MenuItem value="GENERAL">General</MenuItem>
+                </Select>
+              </FormControl>
+
               <Button type="submit" variant="contained" fullWidth>
                 Agregar Recurso
               </Button>
@@ -858,6 +873,7 @@ const AdminDashboard = () => {
                     <Typography variant="body1" fontWeight={600}>{r.title}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       {r.type.toUpperCase()} • {r.source || 'Sin fuente'}
+                      {r.topic && ` • ${r.topic}`}
                     </Typography>
                   </Box>
                   <Button color="error" size="small" variant="outlined" onClick={() => deleteResource(r.id)}>
