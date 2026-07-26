@@ -5,7 +5,11 @@
 
 
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.font-serif {
+  font-family: 'Playfair Display', serif;
 }
 
 /* Custom gradient background */

@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchAIPublicationStats } from '../redux/features/aiStatsSlice';
 import HeroSection from './HeroSection';
-import StatsSection from './StatsSection';
 import PublicationStatsSection from './PublicationStatsSection';
+import FeaturedResourcesSection from './FeaturedResourcesSection';
 import HighlightsSection from './HighlightsSection';
 import CTASection from './CTASection';
 
@@ -17,7 +17,7 @@ const Home = () => {
   return (
     <>
       <HeroSection />
-      <StatsSection />
+      <FeaturedResourcesSection />
       <PublicationStatsSection />
       <HighlightsSection />
       <CTASection />

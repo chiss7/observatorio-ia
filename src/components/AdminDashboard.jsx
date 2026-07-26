@@ -14,6 +14,8 @@ import {
   Select,
   FormControl,
   InputLabel,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -402,7 +404,8 @@ const AdminDashboard = () => {
     type: 'video',
     url: '',
     source: '',
-    topic: 'GENERAL'
+    topic: 'GENERAL',
+    featured: false
   });
   const [loadingResources, setLoadingResources] = useState(false);
 
@@ -608,7 +611,8 @@ const AdminDashboard = () => {
         type: 'video',
         url: '',
         source: '',
-        topic: 'GENERAL'
+        topic: 'GENERAL',
+        featured: false
       });
       fetchResources();
     } catch (err) {
@@ -842,6 +846,16 @@ const AdminDashboard = () => {
                   <MenuItem value="GENERAL">General</MenuItem>
                 </Select>
               </FormControl>
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={newResource.featured}
+                    onChange={(e) => setNewResource({ ...newResource, featured: e.target.checked })}
+                  />
+                }
+                label="Destacado"
+              />
 
               <Button type="submit" variant="contained" fullWidth>
                 Agregar Recurso

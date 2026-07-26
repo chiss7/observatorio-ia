@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import GovernanceSection from './components/GovernanceSection';
-import EthicsSection from './components/EthicsSection';
 import UseCasesSection from './components/UseCasesSection';
 import { MonitoringSection } from './components/MonitoringSection';
 import ParticipationSection from './components/ParticipationSection';
@@ -36,8 +34,6 @@ function App() {
         <Routes>
           {/* Rutas públicas */}
           <Route path="/" element={<Home />} />
-          <Route path="/governance" element={<GovernanceSection />} />
-          <Route path="/ethics" element={<EthicsSection />} />
           <Route path="/dspace" element={<DspaceList />} />
           <Route path="/monitoring" element={<MonitoringSection />} />
           <Route path="/participation" element={<ParticipationSection />} />
