@@ -7,6 +7,7 @@
  * @property {string} url
  * @property {string} [source]
  * @property {string} [createdAt]
+ * @property {boolean} [featured]
  */
 
 export const Resource = {};

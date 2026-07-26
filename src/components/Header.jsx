@@ -6,11 +6,9 @@ import { CiMenuFries } from "react-icons/ci";
 
 const links = [
   { name: "Inicio", path: "/" },
-  { name: "Gobernanza", path: "/governance" },
-  { name: "Ética", path: "/ethics" },
+  { name: "Ética y Gobernanza", path: "/resources" },
   { name: "Monitoreo", path: "/monitoring" },
   { name: "Participación", path: "/participation" },
-  { name: "Recursos", path: "/resources" },
   { name: "Publicaciones", path: "/dspace" },
 ];
 
