@@ -27,9 +27,9 @@ const HeroSection = () => {
               size="large"
               sx={{ bgcolor: 'pink.accent', '&:hover': { bgcolor: '#d63384' }, px: 5, py: 1.5 }}
               endIcon={<ArrowForwardIcon />}
-              href="/governance"
+              href="/resources"
             >
-              Explorar Gobernanza
+              Explorar Recursos
             </Button>
             <Button
               variant="outlined"

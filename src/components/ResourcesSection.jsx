@@ -17,19 +17,6 @@ const TYPE_META = {
   link: { icon: FaLink, label: 'Enlace' },
 };
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.12 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] } },
-};
-
 function SectionHeader({ num, title, color = 'teal' }) {
   const lineColor = color === 'amber' ? 'bg-amber-300' : 'bg-teal-300';
   const numColor = color === 'amber' ? 'text-amber-600' : 'text-teal-600';
@@ -50,11 +37,12 @@ function FeaturedCard({ resource, onOpen }) {
 
   return (
     <motion.div
-      variants={itemVariants}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] } }}
+      viewport={{ once: true, margin: "-40px" }}
       className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-700 via-teal-600 to-teal-800 text-white p-8 md:p-10 cursor-pointer group"
       onClick={() => onOpen(resource)}
-      whileHover={{ scale: 1.01 }}
-      transition={{ type: "spring", stiffness: 300 }}
+      whileHover={{ scale: 1.01, transition: { type: "spring", stiffness: 300 } }}
     >
       <div className="absolute inset-0 opacity-[0.12]">
         <div className="absolute -top-10 -right-10 w-72 h-72 bg-white/20 rounded-full blur-3xl" />
@@ -87,12 +75,14 @@ function FeaturedCard({ resource, onOpen }) {
   );
 }
 
-function ResourceListItem({ resource, onOpen }) {
+function ResourceListItem({ resource, onOpen, index = 0 }) {
   const meta = TYPE_META[resource.type];
 
   return (
     <motion.div
-      variants={itemVariants}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: index * 0.08, ease: [0.25, 0.1, 0.25, 1] } }}
+      viewport={{ once: true, margin: "-40px" }}
       className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-100 hover:border-teal-200 hover:shadow-md transition-all cursor-pointer group"
       onClick={() => onOpen(resource)}
     >
@@ -112,12 +102,14 @@ function ResourceListItem({ resource, onOpen }) {
   );
 }
 
-function ExploraCard({ resource, onOpen }) {
+function ExploraCard({ resource, onOpen, index = 0 }) {
   const meta = TYPE_META[resource.type];
 
   return (
     <motion.div
-      variants={itemVariants}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: index * 0.08, ease: [0.25, 0.1, 0.25, 1] } }}
+      viewport={{ once: true, margin: "-40px" }}
       className="bg-white rounded-2xl border border-gray-100 p-6 cursor-pointer group hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
       onClick={() => onOpen(resource)}
     >
@@ -143,18 +135,12 @@ function ExploraCard({ resource, onOpen }) {
   );
 }
 
-function ResourceSection({ number, title, color, featured, others, onOpen }) {
-  const [showAll, setShowAll] = useState(false);
-  const INITIAL = 6;
-  const visible = showAll ? others : others.slice(0, INITIAL);
+function ResourceSection({ number, title, color, featured, others, onOpen, threshold = 5 }) {
+  const [visibleCount, setVisibleCount] = useState(threshold);
+  const visible = others.slice(0, visibleCount);
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-    >
+    <div>
       <SectionHeader num={number} title={title} color={color} />
       {featured.length > 0 && (
         <div className="space-y-6 mb-8">
@@ -165,18 +151,18 @@ function ResourceSection({ number, title, color, featured, others, onOpen }) {
       )}
       {others.length > 0 ? (
         <div className="space-y-3">
-          {visible.map((r) => (
-            <ResourceListItem key={r.id} resource={r} onOpen={onOpen} />
+          {visible.map((r, i) => (
+            <ResourceListItem key={r.id} resource={r} onOpen={onOpen} index={i} />
           ))}
         </div>
       ) : featured.length === 0 ? (
         <p className="text-gray-400 text-sm italic">No hay recursos disponibles en esta categoría.</p>
       ) : null}
 
-      {others.length > INITIAL && !showAll && (
+      {others.length > visibleCount && (
         <div className="text-center mt-8">
           <button
-            onClick={() => setShowAll(true)}
+            onClick={() => setVisibleCount((prev) => prev + 5)}
             className="inline-flex items-center gap-2 border-2 border-teal-700 text-teal-700 font-semibold tracking-wide px-10 py-3 rounded-lg transition-all duration-200 hover:bg-teal-700 hover:text-white hover:shadow-[0_8px_20px_-8px_rgba(14,116,144,0.5)] group"
           >
             Ver más
@@ -192,7 +178,42 @@ function ResourceSection({ number, title, color, featured, others, onOpen }) {
           </button>
         </div>
       )}
-    </motion.div>
+    </div>
+  );
+}
+
+function ExploraSection({ resources, onOpen }) {
+  const [visibleCount, setVisibleCount] = useState(9);
+  const visible = resources.slice(0, visibleCount);
+
+  return (
+    <div>
+      <SectionHeader num={3} title="Explora Más" color="teal" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {visible.map((r, i) => (
+          <ExploraCard key={r.id} resource={r} onOpen={onOpen} index={i} />
+        ))}
+      </div>
+      {resources.length > visibleCount && (
+        <div className="text-center mt-8">
+          <button
+            onClick={() => setVisibleCount((prev) => prev + 5)}
+            className="inline-flex items-center gap-2 border-2 border-teal-700 text-teal-700 font-semibold tracking-wide px-10 py-3 rounded-lg transition-all duration-200 hover:bg-teal-700 hover:text-white hover:shadow-[0_8px_20px_-8px_rgba(14,116,144,0.5)] group"
+          >
+            Ver más
+            <svg
+              className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-[3px]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -296,19 +317,7 @@ const ResourcesSection = () => {
 
             {/* EXPLORA MÁS */}
             {generalResources.length > 0 && (
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-80px" }}
-              >
-                <SectionHeader num={3} title="Explora Más" color="teal" />
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {generalResources.map((r) => (
-                    <ExploraCard key={r.id} resource={r} onOpen={openResource} />
-                  ))}
-                </div>
-              </motion.div>
+              <ExploraSection resources={generalResources} onOpen={openResource} />
             )}
           </>
         )}
