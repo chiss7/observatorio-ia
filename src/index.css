@@ -12,9 +12,49 @@ body {
   font-family: 'Playfair Display', serif;
 }
 
+.font-mono {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular,
+    Menlo, Consolas, monospace;
+}
+
 /* Custom gradient background */
 .bg-gradient-custom {
   background: linear-gradient(to right, #e6f0fa, #f9e6f0);
+}
+
+/* Subtle grid for the radar hero */
+.bg-radar-grid {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  background-position: center top;
+}
+
+/* Hairline cards used across the refined light sections */
+.hairline-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 20px 45px -20px rgba(15, 23, 42, 0.15);
+}
+
+/* Leaflet polish for the city maps */
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 16px 32px -16px rgba(15, 23, 42, 0.35);
+}
+.leaflet-popup-content {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.leaflet-popup-content strong {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  color: #333;
+}
+.leaflet-container {
+  font-family: 'DM Sans', sans-serif;
 }
 
 /* :root {

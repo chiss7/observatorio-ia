@@ -574,7 +574,7 @@ const FeaturedResourcesSection = () => {
     }
   };
 
-  if (!loading && resources.length === 0) return null;
+  if (loading || !Array.isArray(resources) || resources.length === 0) return null;
 
   return (
     <section className="py-24 px-8 bg-white">
@@ -602,107 +602,89 @@ const FeaturedResourcesSection = () => {
           </Typography>
         </motion.div>
 
-        {loading ? (
-          <Box
-            sx={{
-              maxWidth: CAROUSEL_MAX_WIDTH,
-              mx: 'auto',
-              borderRadius: 4,
-              bgcolor: '#fff',
-              border: `1px solid ${HAIRLINE}`,
-              height: 480,
-              animation: 'pulse 2s ease-in-out infinite',
-              '@keyframes pulse': {
-                '0%, 100%': { opacity: 1 },
-                '50%': { opacity: 0.4 },
-              },
-            }}
-          />
-        ) : (
-          <Box
-            sx={{ maxWidth: CAROUSEL_MAX_WIDTH, mx: 'auto', position: 'relative' }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            {resources.length > 1 && (
-              <>
-                <IconButton
-                  onClick={() => paginate(-1)}
-                  sx={{
-                    position: 'absolute',
-                    left: { xs: -8, md: -20 },
-                    top: 'calc(50% - 24px)',
-                    transform: 'translateY(-50%)',
-                    zIndex: 10,
-                    bgcolor: 'rgba(255,255,255,0.92)',
-                    boxShadow: '0 4px 16px rgba(15,23,42,0.1)',
-                    border: `1px solid ${HAIRLINE}`,
-                    width: { xs: 36, md: 44 },
-                    height: { xs: 36, md: 44 },
-                    opacity: isHovered ? 1 : 0,
-                    transition: 'opacity 0.3s ease',
-                    '&:hover': {
-                      bgcolor: '#fff',
-                      boxShadow: '0 6px 20px rgba(15,23,42,0.15)',
-                    },
-                  }}
-                >
-                  <ChevronLeftIcon sx={{ fontSize: { xs: 20, md: 24 }, color: '#334155' }} />
-                </IconButton>
-                <IconButton
-                  onClick={() => paginate(1)}
-                  sx={{
-                    position: 'absolute',
-                    right: { xs: -8, md: -20 },
-                    top: 'calc(50% - 24px)',
-                    transform: 'translateY(-50%)',
-                    zIndex: 10,
-                    bgcolor: 'rgba(255,255,255,0.92)',
-                    boxShadow: '0 4px 16px rgba(15,23,42,0.1)',
-                    border: `1px solid ${HAIRLINE}`,
-                    width: { xs: 36, md: 44 },
-                    height: { xs: 36, md: 44 },
-                    opacity: isHovered ? 1 : 0,
-                    transition: 'opacity 0.3s ease',
-                    '&:hover': {
-                      bgcolor: '#fff',
-                      boxShadow: '0 6px 20px rgba(15,23,42,0.15)',
-                    },
-                  }}
-                >
-                  <ChevronRightIcon sx={{ fontSize: { xs: 20, md: 24 }, color: '#334155' }} />
-                </IconButton>
-              </>
-            )}
+        <Box
+          sx={{ maxWidth: CAROUSEL_MAX_WIDTH, mx: 'auto', position: 'relative' }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {resources.length > 1 && (
+            <>
+              <IconButton
+                onClick={() => paginate(-1)}
+                sx={{
+                  position: 'absolute',
+                  left: { xs: -8, md: -20 },
+                  top: 'calc(50% - 24px)',
+                  transform: 'translateY(-50%)',
+                  zIndex: 10,
+                  bgcolor: 'rgba(255,255,255,0.92)',
+                  boxShadow: '0 4px 16px rgba(15,23,42,0.1)',
+                  border: `1px solid ${HAIRLINE}`,
+                  width: { xs: 36, md: 44 },
+                  height: { xs: 36, md: 44 },
+                  opacity: isHovered ? 1 : 0,
+                  transition: 'opacity 0.3s ease',
+                  '&:hover': {
+                    bgcolor: '#fff',
+                    boxShadow: '0 6px 20px rgba(15,23,42,0.15)',
+                  },
+                }}
+              >
+                <ChevronLeftIcon sx={{ fontSize: { xs: 20, md: 24 }, color: '#334155' }} />
+              </IconButton>
+              <IconButton
+                onClick={() => paginate(1)}
+                sx={{
+                  position: 'absolute',
+                  right: { xs: -8, md: -20 },
+                  top: 'calc(50% - 24px)',
+                  transform: 'translateY(-50%)',
+                  zIndex: 10,
+                  bgcolor: 'rgba(255,255,255,0.92)',
+                  boxShadow: '0 4px 16px rgba(15,23,42,0.1)',
+                  border: `1px solid ${HAIRLINE}`,
+                  width: { xs: 36, md: 44 },
+                  height: { xs: 36, md: 44 },
+                  opacity: isHovered ? 1 : 0,
+                  transition: 'opacity 0.3s ease',
+                  '&:hover': {
+                    bgcolor: '#fff',
+                    boxShadow: '0 6px 20px rgba(15,23,42,0.15)',
+                  },
+                }}
+              >
+                <ChevronRightIcon sx={{ fontSize: { xs: 20, md: 24 }, color: '#334155' }} />
+              </IconButton>
+            </>
+          )}
 
-            <Box sx={{ position: 'relative', overflow: 'hidden', borderRadius: 4 }}>
-              <AnimatePresence mode="wait" custom={direction}>
-                <motion.div
-                  key={currentIndex}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-                >
-                  <SlideCard
-                    resource={resources[currentIndex]}
-                    onOpen={openResource}
-                  />
-                </motion.div>
-              </AnimatePresence>
-            </Box>
-
-            <Dots
-              count={resources.length}
-              active={currentIndex}
-              onChange={goTo}
-            />
+          <Box sx={{ position: 'relative', overflow: 'hidden', borderRadius: 4 }}>
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={currentIndex}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+              >
+                <SlideCard
+                  resource={resources[currentIndex]}
+                  onOpen={openResource}
+                />
+              </motion.div>
+            </AnimatePresence>
           </Box>
-        )}
 
-        {!loading && topicCounts.length > 0 && (
+          <Dots
+            count={resources.length}
+            active={currentIndex}
+            onChange={goTo}
+          />
+        </Box>
+
+        {topicCounts.length > 0 && (
           <TopicCountCards counts={topicCounts} />
         )}
 
