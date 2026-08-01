@@ -18,7 +18,7 @@ import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute'; 
 
 const PublicLayout = () => (
-  <div className="font-sans">
+  <div className="font-sans flex flex-col min-h-dvh">
     <Header />
     <Outlet />
   </div>
