@@ -29,7 +29,7 @@ function App() {
 
   return (
     <Router>  {/* Sin basename por ahora */}
-      <div className="font-sans">
+      <div className="font-sans flex flex-col min-h-screen">
         <Header />
         <Routes>
           {/* Rutas públicas */}
