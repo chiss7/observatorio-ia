@@ -5,10 +5,31 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import sendLottie from '../assets/send.lottie';
-import { CircularProgress, Pagination } from '@mui/material';
+import { CircularProgress, Pagination, Skeleton } from '@mui/material';
 import { FaExclamationTriangle, FaLightbulb } from 'react-icons/fa';
 import { parseIdeasResponse } from '../models/idea/Idea';
 import { getApprovedIdeas } from '../services/ideasService';
+
+function IdeaCardSkeleton() {
+  return (
+    <div className="relative overflow-hidden bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <span className="absolute left-0 top-0 bottom-0 w-[4px] bg-gradient-to-b from-pink-accent to-pink-300" />
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3 min-w-0">
+          <Skeleton variant="circular" width={40} height={40} />
+          <Skeleton variant="text" width={140} height={22} sx={{ mt: 1 }} />
+        </div>
+        <Skeleton variant="text" width={92} height={14} sx={{ pt: 0.5, flexShrink: 0 }} />
+      </div>
+      <Skeleton variant="text" width="96%" height={16} sx={{ mt: 3 }} />
+      <Skeleton variant="text" width="80%" height={16} />
+      <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg px-3.5 py-2.5">
+        <Skeleton variant="text" width={112} height={12} />
+        <Skeleton variant="text" width="72%" height={14} sx={{ mt: 1 }} />
+      </div>
+    </div>
+  );
+}
 
 const ParticipationSection = () => {
   const [formData, setFormData] = useState({ name: '', idea: '', ethicalConcern: '' });
@@ -151,7 +172,11 @@ const ParticipationSection = () => {
             <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl px-6 py-4">
               <span className="w-3 h-3 rounded-full bg-green-400 shadow-[0_0_12px_rgba(74,222,128,0.8)]" />
               <div>
-                <p className="text-3xl font-bold text-white leading-none">{ideasTotal}</p>
+                {ideasLoading ? (
+                  <Skeleton variant="text" width={44} height={34} sx={{ bgcolor: 'rgba(255,255,255,0.12)' }} />
+                ) : (
+                  <p className="text-3xl font-bold text-white leading-none">{ideasTotal}</p>
+                )}
                 <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider">
                   {ideasTotal === 1 ? 'idea aprobada' : 'ideas aprobadas'}
                 </p>
@@ -194,8 +219,10 @@ const ParticipationSection = () => {
             </div>
 
             {ideasLoading && (
-              <div className="flex justify-center py-10">
-                <CircularProgress />
+              <div className="space-y-4">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <IdeaCardSkeleton key={i} />
+                ))}
               </div>
             )}
 
