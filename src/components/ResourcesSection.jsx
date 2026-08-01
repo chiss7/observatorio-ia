@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Skeleton } from '@mui/material';
 import api from '../utils/api';
 import GovernanceSection from './GovernanceSection';
 import { FaYoutube, FaLink } from 'react-icons/fa';
@@ -217,6 +218,83 @@ function ExploraSection({ resources, onOpen }) {
   );
 }
 
+function SectionHeaderSkeleton() {
+  return (
+    <div className="flex items-center gap-4 mb-10">
+      <Skeleton variant="rounded" width={76} height={56} sx={{ borderRadius: 2 }} />
+      <Skeleton variant="rounded" height={1} sx={{ flex: 1 }} />
+      <Skeleton variant="text" width={180} height={36} />
+    </div>
+  );
+}
+
+function FeaturedCardSkeleton() {
+  return (
+    <div className="rounded-2xl bg-teal-50/70 border border-teal-100 p-8 md:p-10 mb-8 overflow-hidden">
+      <Skeleton variant="rounded" width={116} height={30} sx={{ borderRadius: 999, mb: 5 }} />
+      <Skeleton variant="text" width="75%" height={38} sx={{ mb: 2 }} />
+      <Skeleton variant="text" width="52%" height={38} sx={{ mb: 6 }} />
+      <Skeleton variant="text" width="96%" height={16} sx={{ mb: 1 }} />
+      <Skeleton variant="text" width="84%" height={16} sx={{ mb: 8 }} />
+      <Skeleton variant="text" width={132} height={16} />
+    </div>
+  );
+}
+
+function ResourceListItemSkeleton() {
+  return (
+    <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-100">
+      <Skeleton variant="rounded" width={40} height={40} sx={{ borderRadius: 2, flexShrink: 0 }} />
+      <div className="flex-1 min-w-0">
+        <Skeleton variant="text" width="70%" height={20} />
+        <Skeleton variant="text" width={76} height={12} sx={{ mt: 0.75 }} />
+      </div>
+      <Skeleton variant="text" width={16} height={22} sx={{ flexShrink: 0 }} />
+    </div>
+  );
+}
+
+function ExploraCardSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-6">
+      <Skeleton variant="text" width={76} height={16} sx={{ mb: 3 }} />
+      <Skeleton variant="text" width="86%" height={24} sx={{ mb: 2 }} />
+      <Skeleton variant="text" width="96%" height={14} sx={{ mb: 1 }} />
+      <Skeleton variant="text" width="68%" height={14} sx={{ mb: 4 }} />
+      <Skeleton variant="text" width={110} height={12} />
+    </div>
+  );
+}
+
+function ResourcesSkeleton() {
+  return (
+    <div>
+      <SectionHeaderSkeleton />
+      <FeaturedCardSkeleton />
+      <div className="space-y-3 mb-20">
+        {[0, 1, 2].map((i) => (
+          <ResourceListItemSkeleton key={i} />
+        ))}
+      </div>
+
+      <SectionHeaderSkeleton />
+      <FeaturedCardSkeleton />
+      <div className="space-y-3 mb-20">
+        {[0, 1, 2].map((i) => (
+          <ResourceListItemSkeleton key={i} />
+        ))}
+      </div>
+
+      <SectionHeaderSkeleton />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[0, 1, 2].map((i) => (
+          <ExploraCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const ResourcesSection = () => {
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -291,9 +369,7 @@ const ResourcesSection = () => {
       {/* CONTENT */}
       <div className="max-w-6xl mx-auto px-6 py-16 md:py-20 space-y-20">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
-          </div>
+          <ResourcesSkeleton />
         ) : resources.length === 0 ? (
           <p className="text-center text-gray-400 py-20">No hay recursos disponibles aún.</p>
         ) : (
