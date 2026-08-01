@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate , Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -8,14 +8,27 @@ import {
   Button,
   Alert,
   Paper,
+  CircularProgress,
 } from '@mui/material';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useContext(AuthContext);
+  const { login, isAuthenticated, isAdmin, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  if (authLoading) {
+    return (
+      <Box minHeight="80vh" display="flex" alignItems="center" justifyContent="center">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to={isAdmin ? '/admin' : '/dspace'} replace />;
+  }
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -26,11 +39,12 @@ const Login = () => {
     setError('');
     setLoading(true);
 
-    const success = await login(credentials);
+    const result = await login(credentials);
     setLoading(false);
 
-    if (success) {
-      navigate('/dspace'); 
+    if (result.success) {
+      const isAdminUser = result.user?.roles?.includes('ROLE_ADMIN') || result.user?.roles?.includes('ADMIN');
+      navigate(isAdminUser ? '/admin' : '/dspace', { replace: true });
     } else {
       setError('Usuario o contraseña incorrectos');
     }

@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import UseCasesSection from './components/UseCasesSection';
 import { MonitoringSection } from './components/MonitoringSection';
 import ParticipationSection from './components/ParticipationSection';
@@ -8,46 +7,47 @@ import DspaceList from './components/DspaceList';
 import Home from './components/Home';
 import BodySection from './components/BodySection';
 import InteractiveMap from './components/InteractiveMap';
-import AdminDashboard from './components/AdminDashboard';
+import AdminDashboard, {
+  AdminDashboardOverview,
+  AdminDashboardPublications,
+  AdminDashboardResources,
+  AdminDashboardIdeas,
+} from './components/AdminDashboard';
 import Header from './components/Header';
 import Login from './components/Login';     
 import ProtectedRoute from './components/ProtectedRoute'; 
-import { ecuadorProvinces } from './data/ecuadorProvinces';
+
+const PublicLayout = () => (
+  <div className="font-sans">
+    <Header />
+    <Outlet />
+  </div>
+);
 
 function App() {
-  const [provinceData, setProvinceData] = useState(ecuadorProvinces);
-
-  const updateProvinceData = (provinceName, newValue) => {
-    setProvinceData((prevData) =>
-      prevData.map((province) =>
-        province.name === provinceName
-          ? { ...province, aiInterest: newValue }
-          : province
-      )
-    );
-  };
-
   return (
     <Router>  {/* Sin basename por ahora */}
-      <div className="font-sans">
-        <Header />
-        <Routes>
-          {/* Rutas públicas */}
+      <Routes>
+        {/* Rutas públicas con el header del sitio */}
+        <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/dspace" element={<DspaceList />} />
           <Route path="/monitoring" element={<MonitoringSection />} />
           <Route path="/participation" element={<ParticipationSection />} />
           <Route path="/resources" element={<ResourcesSection />} />
-
-          {/* Rutas de autenticación */}
           <Route path="/login" element={<Login />} />
+        </Route>
 
-          {/* Rutas protegidas (requieren login) */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/admin" element={<AdminDashboard />} />
+        {/* Panel de administración (solo admin, sin header del sitio) */}
+        <Route element={<ProtectedRoute adminOnly={true} />}>
+          <Route path="/admin" element={<AdminDashboard />}>
+            <Route index element={<AdminDashboardOverview />} />
+            <Route path="publicaciones" element={<AdminDashboardPublications />} />
+            <Route path="recursos" element={<AdminDashboardResources />} />
+            <Route path="ideas" element={<AdminDashboardIdeas />} />
           </Route>
-        </Routes>
-      </div>
+        </Route>
+      </Routes>
     </Router>
   );
 }

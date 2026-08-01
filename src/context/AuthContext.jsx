@@ -39,10 +39,10 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${newToken}` },
       });
       setUser(meRes.data);
-      return true;
+      return { success: true, user: meRes.data };
     } catch (err) {
       console.error('Login error:', err);
-      return false;
+      return { success: false, user: null };
     }
   };
 
