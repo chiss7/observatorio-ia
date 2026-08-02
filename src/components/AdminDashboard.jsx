@@ -63,6 +63,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { extractCreatePublicationResponse } from '../models/publication/BackResponse';
 import { extractLoadPublicationsResponse } from '../models/publication/LoadPublicationsResponse';
 import { parseIdeasResponse } from '../models/idea/Idea';
+import { parseResourcesResponse } from '../models/resources/resource';
 
 const adminTheme = createTheme({
   palette: {
@@ -82,6 +83,7 @@ const adminTheme = createTheme({
 });
 
 const IDEAS_PAGE_SIZE = 10;
+const RESOURCES_PAGE_SIZE = 12;
 
 const STATUS_LABELS = {
   PENDIENTE_REVISION: { label: 'Pendiente de revisión', color: 'warning' },
@@ -129,6 +131,12 @@ const getYouTubeEmbedUrl = (url) => {
   if (!url) return url;
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+};
+
+const getYouTubeWatchUrl = (url) => {
+  if (!url) return url;
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return match ? `https://www.youtube.com/watch?v=${match[1]}` : url;
 };
 
 const PageHeader = ({ title, subtitle, actions }) => (
@@ -780,12 +788,28 @@ const AdminDashboardResources = () => {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(EMPTY_RESOURCE);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [topicFilter, setTopicFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [featuredFilter, setFeaturedFilter] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
 
-  const fetchResources = async () => {
+  const fetchResources = async (p = page) => {
     setLoading(true);
     try {
-      const res = await api.get('/resources');
-      setResources(res.data.data || res.data);
+      const params = { page: p - 1, size: RESOURCES_PAGE_SIZE };
+      if (topicFilter) params.topic = topicFilter;
+      if (typeFilter) params.type = typeFilter;
+      if (featuredFilter) params.featured = featuredFilter;
+      if (search.trim()) params.search = search.trim();
+      const res = await api.get('/resources/admin', { params });
+      const parsed = parseResourcesResponse(res.data);
+      setResources(parsed.items);
+      setTotalPages(parsed.totalPages);
+      setTotalElements(parsed.total);
     } catch {
       toast.error('Error al cargar los recursos');
     } finally {
@@ -794,8 +818,32 @@ const AdminDashboardResources = () => {
   };
 
   useEffect(() => {
-    fetchResources();
-  }, []);
+    const trimmed = searchInput.trim();
+    const t = setTimeout(() => {
+      setSearch(trimmed);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  useEffect(() => {
+    fetchResources(page);
+  }, [page, topicFilter, typeFilter, featuredFilter, search]);
+
+  const handleTopicFilterChange = (value) => {
+    setTopicFilter(value);
+    setPage(1);
+  };
+
+  const handleTypeFilterChange = (value) => {
+    setTypeFilter(value);
+    setPage(1);
+  };
+
+  const handleFeaturedFilterChange = (e) => {
+    setFeaturedFilter(e.target.checked);
+    setPage(1);
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -842,7 +890,7 @@ const AdminDashboardResources = () => {
         toast.success('Recurso creado');
       }
       setOpenModal(false);
-      fetchResources();
+      fetchResources(page);
     } catch {
       toast.error('Error al guardar el recurso');
     } finally {
@@ -855,7 +903,11 @@ const AdminDashboardResources = () => {
     try {
       await api.delete(`/resources/${id}`);
       toast.success('Recurso eliminado');
-      fetchResources();
+      if (resources.length === 1 && page > 1) {
+        setPage(page - 1);
+      } else {
+        fetchResources(page);
+      }
     } catch {
       toast.error('Error al eliminar el recurso');
     }
@@ -876,16 +928,80 @@ const AdminDashboardResources = () => {
         ]}
       />
 
+      <Paper
+        elevation={0}
+        sx={{ p: 2, mb: 3, border: '1px solid #e2e8f0', borderRadius: 4 }}
+      >
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          alignItems="center"
+          flexWrap="wrap"
+          useFlexGap
+        >
+          <TextField
+            label="Buscar"
+            placeholder="Título, descripción o fuente"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            size="small"
+            sx={{ minWidth: 220, flex: 1 }}
+          />
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <InputLabel id="topic-filter-label">Temática</InputLabel>
+            <Select
+              labelId="topic-filter-label"
+              value={topicFilter}
+              label="Temática"
+              onChange={(e) => handleTopicFilterChange(e.target.value)}
+            >
+              <MenuItem value="">Todas</MenuItem>
+              <MenuItem value="ETHICS">Ética</MenuItem>
+              <MenuItem value="GOVERNANCE">Gobernanza</MenuItem>
+              <MenuItem value="GENERAL">General</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <InputLabel id="type-filter-label">Tipo</InputLabel>
+            <Select
+              labelId="type-filter-label"
+              value={typeFilter}
+              label="Tipo"
+              onChange={(e) => handleTypeFilterChange(e.target.value)}
+            >
+              <MenuItem value="">Todos</MenuItem>
+              <MenuItem value="video">Video</MenuItem>
+              <MenuItem value="pdf">PDF / Documento</MenuItem>
+              <MenuItem value="link">Enlace externo</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControlLabel
+            control={<Checkbox checked={featuredFilter} onChange={handleFeaturedFilterChange} />}
+            label="Solo destacados"
+            sx={{ ml: 0 }}
+          />
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+            {totalElements} recurso{totalElements === 1 ? '' : 's'}
+          </Typography>
+        </Stack>
+      </Paper>
+
       {loading ? (
         <Box display="flex" justifyContent="center" my={6}>
           <CircularProgress />
         </Box>
       ) : resources.length === 0 ? (
         <Paper elevation={0} sx={{ p: 6, textAlign: 'center', border: '1px dashed #cbd5e1', borderRadius: 4 }}>
-          <Typography variant="h6" color="text.secondary">No hay recursos aún.</Typography>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} sx={{ mt: 2 }}>
-            Agregar el primero
-          </Button>
+          {(topicFilter || typeFilter || featuredFilter || search) ? (
+            <Typography variant="h6" color="text.secondary">No hay recursos que coincidan con los filtros.</Typography>
+          ) : (
+            <>
+              <Typography variant="h6" color="text.secondary">No hay recursos aún.</Typography>
+              <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} sx={{ mt: 2 }}>
+                Agregar el primero
+              </Button>
+            </>
+          )}
         </Paper>
       ) : (
         <Grid container spacing={3}>
@@ -927,7 +1043,7 @@ const AdminDashboardResources = () => {
                   <Button size="small" color="error" variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={() => deleteResource(r.id)}>
                     Eliminar
                   </Button>
-                  <Button size="small" component="a" href={r.url} target="_blank" rel="noreferrer" endIcon={<OpenInNewIcon fontSize="small" />}>
+                  <Button size="small" component="a" href={r.type === 'video' ? getYouTubeWatchUrl(r.url) : r.url} target="_blank" rel="noreferrer" endIcon={<OpenInNewIcon fontSize="small" />}>
                     Abrir
                   </Button>
                 </Box>
@@ -935,6 +1051,18 @@ const AdminDashboardResources = () => {
             </Grid>
           ))}
         </Grid>
+      )}
+
+      {!loading && resources.length > 0 && totalPages > 1 && (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(e, value) => setPage(value)}
+            color="primary"
+            shape="rounded"
+          />
+        </Box>
       )}
 
       <Dialog
