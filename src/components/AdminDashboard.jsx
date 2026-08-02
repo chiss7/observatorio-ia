@@ -90,6 +90,13 @@ const STATUS_LABELS = {
   HECHO: { label: 'Hecho', color: 'info' },
 };
 
+const STATUS_TRANSITIONS = {
+  PENDIENTE_REVISION: ['APROBADO', 'RECHAZADO'],
+  APROBADO: ['HECHO'],
+  RECHAZADO: [],
+  HECHO: [],
+};
+
 const SECTIONS = [
   { id: 'resumen', label: 'Resumen', icon: <DashboardIcon />, to: '/admin' },
   { id: 'publicaciones', label: 'Publicaciones', icon: <ArticleIcon />, to: '/admin/publicaciones' },
@@ -1145,6 +1152,8 @@ const AdminDashboardIdeas = () => {
         <Stack spacing={2}>
           {ideas.map((idea) => {
             const status = STATUS_LABELS[idea.status] || { label: idea.status, color: 'default' };
+            const transitions = STATUS_TRANSITIONS[idea.status] || [];
+            const canChange = transitions.length > 0;
             return (
               <Paper
                 key={idea.id}
@@ -1210,13 +1219,17 @@ const AdminDashboardIdeas = () => {
                       labelId={`status-label-${idea.id}`}
                       value={idea.status}
                       label="Cambiar estado"
-                      disabled={updatingId === idea.id}
+                      disabled={updatingId === idea.id || !canChange}
                       onChange={(e) => updateIdeaStatus(idea.id, e.target.value)}
                     >
-                      <MenuItem value="PENDIENTE_REVISION">Pendiente de revisión</MenuItem>
-                      <MenuItem value="APROBADO">Aprobar</MenuItem>
-                      <MenuItem value="RECHAZADO">Rechazar</MenuItem>
-                      <MenuItem value="HECHO">Marcar como hecho</MenuItem>
+                      <MenuItem value={idea.status} disabled>
+                        {status.label}
+                      </MenuItem>
+                      {transitions.map((target) => (
+                        <MenuItem key={target} value={target}>
+                          {STATUS_LABELS[target].label}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                   {updatingId === idea.id && <CircularProgress size={20} />}
