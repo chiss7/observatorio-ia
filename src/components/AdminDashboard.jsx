@@ -1240,16 +1240,14 @@ const AdminDashboardIdeas = () => {
         </Stack>
       )}
 
-      {ideasTotalPages > 1 && (
-        <Box display="flex" justifyContent="center" mt={4}>
-          <Pagination
-            count={ideasTotalPages}
-            page={ideasPage}
-            onChange={(_, value) => setIdeasPage(value)}
-            color="primary"
-          />
-        </Box>
-      )}
+      <Box display="flex" justifyContent="center" mt={4}>
+        <Pagination
+          count={ideasTotalPages}
+          page={ideasPage}
+          onChange={(_, value) => setIdeasPage(value)}
+          color="primary"
+        />
+      </Box>
     </Box>
   );
 };
