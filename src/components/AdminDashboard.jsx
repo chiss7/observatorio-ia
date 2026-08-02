@@ -90,6 +90,13 @@ const STATUS_LABELS = {
   HECHO: { label: 'Hecho', color: 'info' },
 };
 
+const STATUS_TRANSITIONS = {
+  PENDIENTE_REVISION: ['APROBADO', 'RECHAZADO'],
+  APROBADO: ['HECHO'],
+  RECHAZADO: [],
+  HECHO: [],
+};
+
 const SECTIONS = [
   { id: 'resumen', label: 'Resumen', icon: <DashboardIcon />, to: '/admin' },
   { id: 'publicaciones', label: 'Publicaciones', icon: <ArticleIcon />, to: '/admin/publicaciones' },
@@ -1035,13 +1042,16 @@ const AdminDashboardIdeas = () => {
   const [ideasTotal, setIdeasTotal] = useState(0);
   const [ideasTotalPages, setIdeasTotalPages] = useState(0);
   const [ideasPage, setIdeasPage] = useState(1);
+  const [ideasStatusFilter, setIdeasStatusFilter] = useState('');
   const [loadingIdeas, setLoadingIdeas] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
 
   const fetchIdeas = async (page = 1) => {
     setLoadingIdeas(true);
     try {
-      const res = await api.get('/ideas', { params: { page: page - 1, size: IDEAS_PAGE_SIZE } });
+      const params = { page: page - 1, size: IDEAS_PAGE_SIZE };
+      if (ideasStatusFilter) params.status = ideasStatusFilter;
+      const res = await api.get('/ideas', { params });
       const parsed = parseIdeasResponse(res.data);
       setIdeas(parsed.items);
       setIdeasTotal(parsed.total);
@@ -1055,7 +1065,12 @@ const AdminDashboardIdeas = () => {
 
   useEffect(() => {
     fetchIdeas(ideasPage);
-  }, [ideasPage]);
+  }, [ideasPage, ideasStatusFilter]);
+
+  const handleStatusFilterChange = (value) => {
+    setIdeasPage(1);
+    setIdeasStatusFilter(value);
+  };
 
   const updateIdeaStatus = async (id, status) => {
     setUpdatingId(id);
@@ -1108,6 +1123,23 @@ const AdminDashboardIdeas = () => {
         </Box>
       </Paper>
 
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <FormControl size="small" sx={{ minWidth: 220 }}>
+          <InputLabel id="ideas-status-filter-label">Filtrar por estado</InputLabel>
+          <Select
+            labelId="ideas-status-filter-label"
+            value={ideasStatusFilter}
+            label="Filtrar por estado"
+            onChange={(e) => handleStatusFilterChange(e.target.value)}
+          >
+            <MenuItem value="">Todos los estados</MenuItem>
+            {Object.entries(STATUS_LABELS).map(([key, s]) => (
+              <MenuItem key={key} value={key}>{s.label}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
       {loadingIdeas ? (
         <Box display="flex" justifyContent="center" my={6}>
           <CircularProgress />
@@ -1120,6 +1152,8 @@ const AdminDashboardIdeas = () => {
         <Stack spacing={2}>
           {ideas.map((idea) => {
             const status = STATUS_LABELS[idea.status] || { label: idea.status, color: 'default' };
+            const transitions = STATUS_TRANSITIONS[idea.status] || [];
+            const canChange = transitions.length > 0;
             return (
               <Paper
                 key={idea.id}
@@ -1185,13 +1219,17 @@ const AdminDashboardIdeas = () => {
                       labelId={`status-label-${idea.id}`}
                       value={idea.status}
                       label="Cambiar estado"
-                      disabled={updatingId === idea.id}
+                      disabled={updatingId === idea.id || !canChange}
                       onChange={(e) => updateIdeaStatus(idea.id, e.target.value)}
                     >
-                      <MenuItem value="PENDIENTE_REVISION">Pendiente de revisión</MenuItem>
-                      <MenuItem value="APROBADO">Aprobar</MenuItem>
-                      <MenuItem value="RECHAZADO">Rechazar</MenuItem>
-                      <MenuItem value="HECHO">Marcar como hecho</MenuItem>
+                      <MenuItem value={idea.status} disabled>
+                        {status.label}
+                      </MenuItem>
+                      {transitions.map((target) => (
+                        <MenuItem key={target} value={target}>
+                          {STATUS_LABELS[target].label}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                   {updatingId === idea.id && <CircularProgress size={20} />}
@@ -1202,16 +1240,14 @@ const AdminDashboardIdeas = () => {
         </Stack>
       )}
 
-      {ideasTotalPages > 1 && (
-        <Box display="flex" justifyContent="center" mt={4}>
-          <Pagination
-            count={ideasTotalPages}
-            page={ideasPage}
-            onChange={(_, value) => setIdeasPage(value)}
-            color="primary"
-          />
-        </Box>
-      )}
+      <Box display="flex" justifyContent="center" mt={4}>
+        <Pagination
+          count={ideasTotalPages}
+          page={ideasPage}
+          onChange={(_, value) => setIdeasPage(value)}
+          color="primary"
+        />
+      </Box>
     </Box>
   );
 };
