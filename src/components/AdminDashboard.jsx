@@ -133,6 +133,12 @@ const getYouTubeEmbedUrl = (url) => {
   return match ? `https://www.youtube.com/embed/${match[1]}` : url;
 };
 
+const getYouTubeWatchUrl = (url) => {
+  if (!url) return url;
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return match ? `https://www.youtube.com/watch?v=${match[1]}` : url;
+};
+
 const PageHeader = ({ title, subtitle, actions }) => (
   <Stack
     direction={{ xs: 'column', md: 'row' }}
@@ -1037,7 +1043,7 @@ const AdminDashboardResources = () => {
                   <Button size="small" color="error" variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={() => deleteResource(r.id)}>
                     Eliminar
                   </Button>
-                  <Button size="small" component="a" href={r.url} target="_blank" rel="noreferrer" endIcon={<OpenInNewIcon fontSize="small" />}>
+                  <Button size="small" component="a" href={r.type === 'video' ? getYouTubeWatchUrl(r.url) : r.url} target="_blank" rel="noreferrer" endIcon={<OpenInNewIcon fontSize="small" />}>
                     Abrir
                   </Button>
                 </Box>
