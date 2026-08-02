@@ -1035,13 +1035,16 @@ const AdminDashboardIdeas = () => {
   const [ideasTotal, setIdeasTotal] = useState(0);
   const [ideasTotalPages, setIdeasTotalPages] = useState(0);
   const [ideasPage, setIdeasPage] = useState(1);
+  const [ideasStatusFilter, setIdeasStatusFilter] = useState('');
   const [loadingIdeas, setLoadingIdeas] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
 
   const fetchIdeas = async (page = 1) => {
     setLoadingIdeas(true);
     try {
-      const res = await api.get('/ideas', { params: { page: page - 1, size: IDEAS_PAGE_SIZE } });
+      const params = { page: page - 1, size: IDEAS_PAGE_SIZE };
+      if (ideasStatusFilter) params.status = ideasStatusFilter;
+      const res = await api.get('/ideas', { params });
       const parsed = parseIdeasResponse(res.data);
       setIdeas(parsed.items);
       setIdeasTotal(parsed.total);
@@ -1055,7 +1058,12 @@ const AdminDashboardIdeas = () => {
 
   useEffect(() => {
     fetchIdeas(ideasPage);
-  }, [ideasPage]);
+  }, [ideasPage, ideasStatusFilter]);
+
+  const handleStatusFilterChange = (value) => {
+    setIdeasPage(1);
+    setIdeasStatusFilter(value);
+  };
 
   const updateIdeaStatus = async (id, status) => {
     setUpdatingId(id);
@@ -1107,6 +1115,23 @@ const AdminDashboardIdeas = () => {
           </Typography>
         </Box>
       </Paper>
+
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <FormControl size="small" sx={{ minWidth: 220 }}>
+          <InputLabel id="ideas-status-filter-label">Filtrar por estado</InputLabel>
+          <Select
+            labelId="ideas-status-filter-label"
+            value={ideasStatusFilter}
+            label="Filtrar por estado"
+            onChange={(e) => handleStatusFilterChange(e.target.value)}
+          >
+            <MenuItem value="">Todos los estados</MenuItem>
+            {Object.entries(STATUS_LABELS).map(([key, s]) => (
+              <MenuItem key={key} value={key}>{s.label}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
 
       {loadingIdeas ? (
         <Box display="flex" justifyContent="center" my={6}>
