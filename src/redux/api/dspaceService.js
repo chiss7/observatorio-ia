@@ -72,4 +72,83 @@ export async function getFilterOptions() {
   }
 }
 
-export default { getDspaceInfo, getSocialMediaMetrics, getFilterOptions };
+export async function createPublication(payload, pdfFile) {
+  try {
+    const token = localStorage.getItem('token');
+    const formData = new FormData();
+    formData.append('payload_json', JSON.stringify(payload));
+    if (pdfFile) formData.append('file', pdfFile);
+    const { data } = await api.post('/publications', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      timeout: 30000,
+    });
+    console.log('[FE-CREATE] response', data);
+    return data;
+  } catch (error) {
+    if (error && error.response) {
+      console.error('Publication create API error response:', {
+        status: error.response.status,
+        data: error.response.data,
+      });
+      throw error.response.data || { message: 'Server error', status: error.response.status };
+    }
+    console.error('Publication create API error:', error);
+    throw error;
+  }
+}
+
+export async function updatePublication(publicationId, payload, pdfFile) {
+  try {
+    const token = localStorage.getItem('token');
+    const formData = new FormData();
+    formData.append('payload_json', JSON.stringify(payload));
+    if (pdfFile) formData.append('file', pdfFile);
+    console.log('[FE-UPDATE] PUT /publications/' + publicationId, { payload, hasFile: Boolean(pdfFile) });
+    const { data } = await api.put(`/publications/${publicationId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      timeout: 30000,
+    });
+    console.log('[FE-UPDATE] response', data);
+    return data;
+  } catch (error) {
+    if (error && error.response) {
+      console.error('Publication update API error response:', {
+        status: error.response.status,
+        data: error.response.data,
+      });
+      throw error.response.data || { message: 'Server error', status: error.response.status };
+    }
+    console.error('Publication update API error:', error);
+    throw error;
+  }
+}
+
+export async function deletePublication(publicationId) {
+  try {
+    const token = localStorage.getItem('token');
+    console.log('[FE-DELETE] DELETE /publications/' + publicationId);
+    const { data } = await api.delete(`/publications/${publicationId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    console.log('[FE-DELETE] response', data);
+    return data;
+  } catch (error) {
+    if (error && error.response) {
+      console.error('Publication delete API error response:', {
+        status: error.response.status,
+        data: error.response.data,
+      });
+      throw error.response.data || { message: 'Server error', status: error.response.status };
+    }
+    console.error('Publication delete API error:', error);
+    throw error;
+  }
+}
+
+export default { getDspaceInfo, getSocialMediaMetrics, getFilterOptions, createPublication, updatePublication, deletePublication };

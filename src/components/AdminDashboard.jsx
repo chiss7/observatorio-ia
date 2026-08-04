@@ -64,6 +64,8 @@ import { extractCreatePublicationResponse } from '../models/publication/BackResp
 import { extractLoadPublicationsResponse } from '../models/publication/LoadPublicationsResponse';
 import { parseIdeasResponse } from '../models/idea/Idea';
 import { parseResourcesResponse } from '../models/resources/resource';
+import AdminPublicationsList from './AdminPublicationsList';
+import { createPublication } from '../redux/api/dspaceService';
 
 const adminTheme = createTheme({
   palette: {
@@ -417,6 +419,7 @@ const AdminDashboardPublications = () => {
   const [creating, setCreating] = useState(false);
   const [loadingScrape, setLoadingScrape] = useState(false);
   const [loadingScrapeJournals, setLoadingScrapeJournals] = useState(false);
+  const [publicationsRefreshKey, setPublicationsRefreshKey] = useState(0);
   const [form, setForm] = useState({
     title: '',
     summary: '',
@@ -511,16 +514,10 @@ const AdminDashboardPublications = () => {
         subjects: form.subjects,
         contributors: form.contributors,
       };
-      const formData = new FormData();
-      formData.append('payload_json', JSON.stringify(payload));
-      formData.append('file', file);
-
-      const res = await api.post('/publications', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      const backResponse = res?.data;
+      const backResponse = await createPublication(payload, file);
       const created = extractCreatePublicationResponse(backResponse);
       toast.success(created ? `Publicación creada (id: ${created.id})` : 'Publicación creada exitosamente');
+      setPublicationsRefreshKey((k) => k + 1);
       setOpenCreate(false);
       resetForm();
     } catch {
@@ -543,6 +540,7 @@ const AdminDashboardPublications = () => {
           } else {
             toast.success(`Se guardaron ${load.saved} publicaciones`);
           }
+          setPublicationsRefreshKey((k) => k + 1);
         } else {
           toast.error('Error en scraping: ' + (backResponse?.messages?.join?.(', ') || 'status no OK'));
         }
@@ -569,6 +567,7 @@ const AdminDashboardPublications = () => {
           } else {
             toast.success(`Se guardaron ${load.saved} publicaciones`);
           }
+          setPublicationsRefreshKey((k) => k + 1);
         } else {
           toast.error('Error en scraping: ' + (backResponse?.messages?.join?.(', ') || 'status no OK'));
         }
@@ -642,6 +641,8 @@ const AdminDashboardPublications = () => {
           </Button>
         </Stack>
       </Paper>
+
+      <AdminPublicationsList refreshKey={publicationsRefreshKey} />
 
       <Dialog
         open={openCreate}
