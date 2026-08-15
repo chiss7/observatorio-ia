@@ -14,6 +14,7 @@ import AdminDashboard, {
   AdminDashboardIdeas,
 } from './components/AdminDashboard';
 import Header from './components/Header';
+import KeepAlive from './components/KeepAlive';
 import Login from './components/Login';     
 import ProtectedRoute from './components/ProtectedRoute'; 
 
@@ -27,6 +28,7 @@ const PublicLayout = () => (
 function App() {
   return (
     <Router>  {/* Sin basename por ahora */}
+      <KeepAlive />
       <Routes>
         {/* Rutas públicas con el header del sitio */}
         <Route element={<PublicLayout />}>
