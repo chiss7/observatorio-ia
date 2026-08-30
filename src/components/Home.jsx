@@ -4,7 +4,6 @@ import { fetchAIPublicationStats } from '../redux/features/aiStatsSlice';
 import HeroSection from './HeroSection';
 import PublicationStatsSection from './PublicationStatsSection';
 import FeaturedResourcesSection from './FeaturedResourcesSection';
-import HighlightsSection from './HighlightsSection';
 import CTASection from './CTASection';
 
 const Home = () => {
@@ -19,7 +18,6 @@ const Home = () => {
       <HeroSection />
       <FeaturedResourcesSection />
       <PublicationStatsSection />
-      <HighlightsSection />
       <CTASection />
     </>
   );

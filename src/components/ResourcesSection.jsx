@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from '@mui/material';
 import api from '../utils/api';
-import GovernanceSection from './GovernanceSection';
 import { FaYoutube, FaLink } from 'react-icons/fa';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 
@@ -398,8 +397,6 @@ const ResourcesSection = () => {
           </>
         )}
       </div>
-
-      <GovernanceSection />
 
       {/* VIDEO MODAL */}
       <AnimatePresence>
