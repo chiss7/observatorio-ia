@@ -3,6 +3,7 @@
  * @property {number} id
  * @property {string} name
  * @property {string} idea
+ * @property {string} category
  * @property {string} [ethicalConcern]
  * @property {string} status
  * @property {string} [createdAt]
@@ -20,6 +21,7 @@ export function mapIdea(item) {
     id: item.id,
     name: item.name,
     idea: item.idea,
+    category: item.category,
     ethicalConcern: item.ethicalConcern,
     status: item.status,
     createdAt: item.createdAt,

@@ -26,4 +26,22 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Python microservice API (for publications)
+const pythonDevUrl = import.meta.env.VITE_API_DEV_URL;
+const pythonProdUrl = import.meta.env.VITE_API_PROD_URL;
+const pythonBaseURL = mode === 'production' ? pythonProdUrl : pythonDevUrl;
+
+const pythonApi = axios.create({
+  baseURL: pythonBaseURL,
+});
+
+pythonApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export { api, pythonApi };
 export default api;

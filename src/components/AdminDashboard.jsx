@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import api from '../utils/api';
+import { api, pythonApi } from '../utils/api';
 import {
   Box,
   Typography,
@@ -99,6 +99,12 @@ const STATUS_TRANSITIONS = {
   APROBADO: ['HECHO'],
   RECHAZADO: [],
   HECHO: [],
+};
+
+const CATEGORY_LABELS = {
+  SUGERENCIA: 'Sugerencia',
+  COMENTARIO: 'Comentario',
+  REPORTE_ERROR: 'Reporte de error',
 };
 
 const SECTIONS = [
@@ -235,25 +241,27 @@ const DrawerContent = ({ onNavigate }) => {
 
 const AdminDashboardOverview = () => {
   const { user } = useContext(AuthContext);
-  const [stats, setStats] = useState({ resources: null, ideas: null });
+  const [stats, setStats] = useState({ resources: null, ideas: null, publications: null });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [resRes, ideasRes] = await Promise.all([
+        const [resRes, ideasRes, pubRes] = await Promise.all([
           api.get('/resources'),
           api.get('/ideas', { params: { page: 0, size: 1 } }).catch(() => null),
+          pythonApi.get('/publications/count').catch(() => null),
         ]);
         if (cancelled) return;
         const resourcesData = resRes?.data?.data ?? resRes?.data;
         setStats({
           resources: Array.isArray(resourcesData) ? resourcesData.length : null,
           ideas: ideasRes?.data?.data?.totalElements ?? null,
+          publications: pubRes?.data?.count ?? null,
         });
       } catch {
-        if (!cancelled) setStats({ resources: null, ideas: null });
+        if (!cancelled) setStats({ resources: null, ideas: null, publications: null });
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -266,11 +274,11 @@ const AdminDashboardOverview = () => {
   const cards = [
     {
       title: 'Publicaciones',
-      value: '—',
+      value: loading ? '…' : (stats.publications ?? '—'),
       desc: 'Crear y extraer publicaciones',
       to: '/admin/publicaciones',
       icon: <ArticleIcon />,
-      color: 'linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)',
+      color: 'linear-gradient(135deg, #0c4a6e 0%, #1e3a8a 100%)',
     },
     {
       title: 'Recursos',
@@ -278,15 +286,15 @@ const AdminDashboardOverview = () => {
       desc: 'Gestionar recursos del sitio',
       to: '/admin/recursos',
       icon: <LibraryBooksIcon />,
-      color: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+      color: 'linear-gradient(135deg, #9a3412 0%, #7f1d1d 100%)',
     },
     {
-      title: 'Ideas de la comunidad',
+      title: 'Aportes de la comunidad',
       value: loading ? '…' : (stats.ideas ?? '—'),
       desc: 'Revisar y aprobar ideas',
       to: '/admin/ideas',
       icon: <LightbulbIcon />,
-      color: 'linear-gradient(135deg, #db2777 0%, #7c3aed 100%)',
+      color: 'linear-gradient(135deg, #9d174d 0%, #581c87 100%)',
     },
   ];
 
@@ -1172,6 +1180,7 @@ const AdminDashboardIdeas = () => {
   const [ideasTotalPages, setIdeasTotalPages] = useState(0);
   const [ideasPage, setIdeasPage] = useState(1);
   const [ideasStatusFilter, setIdeasStatusFilter] = useState('');
+  const [ideasCategoryFilter, setIdeasCategoryFilter] = useState('');
   const [loadingIdeas, setLoadingIdeas] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
 
@@ -1180,6 +1189,7 @@ const AdminDashboardIdeas = () => {
     try {
       const params = { page: page - 1, size: IDEAS_PAGE_SIZE };
       if (ideasStatusFilter) params.status = ideasStatusFilter;
+      if (ideasCategoryFilter) params.category = ideasCategoryFilter;
       const res = await api.get('/ideas', { params });
       const parsed = parseIdeasResponse(res.data);
       setIdeas(parsed.items);
@@ -1194,11 +1204,16 @@ const AdminDashboardIdeas = () => {
 
   useEffect(() => {
     fetchIdeas(ideasPage);
-  }, [ideasPage, ideasStatusFilter]);
+  }, [ideasPage, ideasStatusFilter, ideasCategoryFilter]);
 
   const handleStatusFilterChange = (value) => {
     setIdeasPage(1);
     setIdeasStatusFilter(value);
+  };
+
+  const handleCategoryFilterChange = (value) => {
+    setIdeasPage(1);
+    setIdeasCategoryFilter(value);
   };
 
   const updateIdeaStatus = async (id, status) => {
@@ -1252,7 +1267,7 @@ const AdminDashboardIdeas = () => {
         </Box>
       </Paper>
 
-      <Box display="flex" justifyContent="flex-end" mb={2}>
+      <Box display="flex" justifyContent="flex-end" gap={2} mb={2} flexWrap="wrap">
         <FormControl size="small" sx={{ minWidth: 220 }}>
           <InputLabel id="ideas-status-filter-label">Filtrar por estado</InputLabel>
           <Select
@@ -1264,6 +1279,20 @@ const AdminDashboardIdeas = () => {
             <MenuItem value="">Todos los estados</MenuItem>
             {Object.entries(STATUS_LABELS).map(([key, s]) => (
               <MenuItem key={key} value={key}>{s.label}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 220 }}>
+          <InputLabel id="ideas-category-filter-label">Filtrar por categoría</InputLabel>
+          <Select
+            labelId="ideas-category-filter-label"
+            value={ideasCategoryFilter}
+            label="Filtrar por categoría"
+            onChange={(e) => handleCategoryFilterChange(e.target.value)}
+          >
+            <MenuItem value="">Todas las categorías</MenuItem>
+            {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
+              <MenuItem key={key} value={key}>{label}</MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -1281,7 +1310,11 @@ const AdminDashboardIdeas = () => {
         <Stack spacing={2}>
           {ideas.map((idea) => {
             const status = STATUS_LABELS[idea.status] || { label: idea.status, color: 'default' };
-            const transitions = STATUS_TRANSITIONS[idea.status] || [];
+            let transitions = STATUS_TRANSITIONS[idea.status] || [];
+            // COMENTARIO category cannot transition to HECHO
+            if (idea.category === 'COMENTARIO' && idea.status === 'APROBADO') {
+              transitions = transitions.filter(t => t !== 'HECHO');
+            }
             const canChange = transitions.length > 0;
             return (
               <Paper
@@ -1316,6 +1349,14 @@ const AdminDashboardIdeas = () => {
                     size="small"
                     sx={{ alignSelf: 'flex-start' }}
                   />
+                  {idea.category && (
+                    <Chip
+                      label={idea.category}
+                      variant="outlined"
+                      size="small"
+                      sx={{ alignSelf: 'flex-start', ml: 1 }}
+                    />
+                  )}
                 </Stack>
 
                 <Typography variant="body1" mb={idea.ethicalConcern ? 1.5 : 2}>
