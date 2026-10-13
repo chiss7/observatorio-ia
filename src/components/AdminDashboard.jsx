@@ -278,7 +278,8 @@ const AdminDashboardOverview = () => {
       desc: 'Crear y extraer publicaciones',
       to: '/admin/publicaciones',
       icon: <ArticleIcon />,
-      color: 'linear-gradient(135deg, #0c4a6e 0%, #1e3a8a 100%)',
+      bg: '#0c4a6e',
+      gradient: 'linear-gradient(135deg, #0c4a6e 0%, #1e3a8a 100%)',
     },
     {
       title: 'Recursos',
@@ -286,7 +287,8 @@ const AdminDashboardOverview = () => {
       desc: 'Gestionar recursos del sitio',
       to: '/admin/recursos',
       icon: <LibraryBooksIcon />,
-      color: 'linear-gradient(135deg, #9a3412 0%, #7f1d1d 100%)',
+      bg: '#9a3412',
+      gradient: 'linear-gradient(135deg, #9a3412 0%, #7f1d1d 100%)',
     },
     {
       title: 'Aportes de la comunidad',
@@ -294,7 +296,8 @@ const AdminDashboardOverview = () => {
       desc: 'Revisar y aprobar ideas',
       to: '/admin/ideas',
       icon: <LightbulbIcon />,
-      color: 'linear-gradient(135deg, #9d174d 0%, #581c87 100%)',
+      bg: '#9d174d',
+      gradient: 'linear-gradient(135deg, #9d174d 0%, #581c87 100%)',
     },
   ];
 
@@ -328,26 +331,29 @@ const AdminDashboardOverview = () => {
               component={Link}
               to={c.to}
               sx={{
+                display: 'block',
                 textDecoration: 'none',
-                background: c.color,
+                backgroundColor: c.bg,          // respaldo sólido
+                backgroundImage: c.gradient,    // degradado encima
                 color: '#fff',
-                borderRadius: 4,
+                borderRadius: 1.5,
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'transform .2s ease, box-shadow .2s ease',
                 '&:hover': { transform: 'translateY(-4px)', boxShadow: 8 },
+                '&, &:visited, &:hover': { color: '#fff' },
               }}
             >
-              <CardContent sx={{ position: 'relative', zIndex: 1 }}>
+              <CardContent sx={{ position: 'relative', zIndex: 1, color: '#fff' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <Box>
-                    <Typography variant="h3" fontWeight={900}>{c.value}</Typography>
-                    <Typography variant="h6" fontWeight={700} mt={0.5}>{c.title}</Typography>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5 }}>
+                    <Typography variant="h3" fontWeight={900} sx={{ color: '#fff' }}>{c.value}</Typography>
+                    <Typography variant="h6" fontWeight={700} mt={0.5} sx={{ color: '#fff' }}>{c.title}</Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', mt: 0.5 }}>
                       {c.desc}
                     </Typography>
                   </Box>
-                  <Box sx={{ fontSize: 44, opacity: 0.9 }}>{c.icon}</Box>
+                  <Box sx={{ fontSize: 44, opacity: 0.9, color: '#fff' }}>{c.icon}</Box>
                 </Box>
                 <Box
                   sx={{
