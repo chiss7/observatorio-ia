@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import api from '../utils/api';
 import { toast, ToastContainer } from 'react-toastify';
@@ -6,9 +6,55 @@ import 'react-toastify/dist/ReactToastify.css';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import sendLottie from '../assets/send.lottie';
 import { CircularProgress, Pagination, Skeleton } from '@mui/material';
-import { FaExclamationTriangle, FaLightbulb } from 'react-icons/fa';
+import { FaExclamationTriangle, FaLightbulb, FaComment, FaBug } from 'react-icons/fa';
 import { parseIdeasResponse } from '../models/idea/Idea';
 import { getApprovedIdeas } from '../services/ideasService';
+
+// Category configuration with icons, colors, and descriptions
+const CATEGORIES = [
+  {
+    value: 'SUGERENCIA',
+    label: 'Sugerencia',
+    description: 'Nueva funcionalidad o mejora a lo existente',
+    icon: FaLightbulb,
+    color: 'from-violet-500 to-purple-600',
+    borderColor: 'border-violet-500',
+    bgColor: 'bg-violet-50',
+    allowsEthicalConcern: true,
+    allowsDone: true,
+    ideaLabel: 'Sugerencia o Propuesta',
+    ideaPlaceholder: 'Describe tu propuesta: nueva funcionalidad, mejora a lo existente, idea para implementar...',
+    submitText: 'Enviar sugerencia',
+  },
+  {
+    value: 'COMENTARIO',
+    label: 'Comentario',
+    description: 'Opinión o feedback general',
+    icon: FaComment,
+    color: 'from-cyan-500 to-teal-500',
+    borderColor: 'border-cyan-500',
+    bgColor: 'bg-cyan-50',
+    allowsEthicalConcern: false,
+    allowsDone: false,
+    ideaLabel: 'Comentario',
+    ideaPlaceholder: 'Comparte tu opinión, feedback o experiencia general sobre el Observatorio...',
+    submitText: 'Enviar comentario',
+  },
+  {
+    value: 'REPORTE_ERROR',
+    label: 'Reporte de error',
+    description: 'Bug, fallo o problema técnico',
+    icon: FaBug,
+    color: 'from-red-500 to-orange-500',
+    borderColor: 'border-red-500',
+    bgColor: 'bg-red-50',
+    allowsEthicalConcern: false,
+    allowsDone: true,
+    ideaLabel: 'Descripción del error',
+    ideaPlaceholder: 'Detalla el bug o problema: qué pasa, pasos para reproducirlo, qué esperabas que ocurriera...',
+    submitText: 'Reportar error',
+  },
+];
 
 function IdeaCardSkeleton() {
   return (
@@ -31,10 +77,63 @@ function IdeaCardSkeleton() {
   );
 }
 
+function CategoryCard({ category, isSelected, onClick, index }) {
+  const Icon = category.icon;
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      className={`relative group flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer ${
+        isSelected
+          ? `${category.borderColor} bg-gradient-to-br from-transparent to-${category.bgColor} shadow-[0_0_0_3px_${category.borderColor.replace('border-', '').replace('500', '200')}] scale-[1.02]`
+          : 'border-gray-200 hover:border-gray-300 hover:shadow-lg hover:scale-[1.01]'
+      }`}
+      whileHover={{ y: -4, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+      style={{ boxShadow: isSelected ? `0 8px 30px -8px ${category.borderColor.replace('border-', '').replace('500', '')}` : undefined }}
+    >
+      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br ${category.color} text-white shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)] transition-transform group-hover:rotate-3`}>
+        <Icon size={28} />
+      </div>
+      <div className="text-center">
+        <h4 className="font-semibold text-text-dark text-base">{category.label}</h4>
+        <p className="text-xs text-text-medium mt-0.5 leading-snug">{category.description}</p>
+      </div>
+      {isSelected && (
+        <motion.div
+          className="absolute top-3 right-3 w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white shadow-[0_2px_8px_-2px_rgba(236,72,153,0.6)]"
+          initial={{ scale: 0, rotate: -90 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </motion.div>
+      )}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      />
+    </motion.button>
+  );
+}
+
 const ParticipationSection = () => {
-  const [formData, setFormData] = useState({ name: '', idea: '', ethicalConcern: '' });
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    idea: '', 
+    ethicalConcern: '', 
+    category: '' 
+  });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [categoryError, setCategoryError] = useState(false);
 
   const [ideas, setIdeas] = useState([]);
   const [ideasTotal, setIdeasTotal] = useState(0);
@@ -49,7 +148,7 @@ const ParticipationSection = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, staggerChildren: 0.3 },
+      transition: { duration: 0.8, staggerChildren: 0.2 },
     },
   };
 
@@ -57,6 +156,9 @@ const ParticipationSection = () => {
     hidden: { opacity: 0, x: -50 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
   };
+
+  const selectedCategory = CATEGORIES.find(c => c.value === formData.category);
+  const showEthicalConcern = selectedCategory?.allowsEthicalConcern ?? false;
 
   useEffect(() => {
     let cancelled = false;
@@ -71,7 +173,7 @@ const ParticipationSection = () => {
         setIdeasTotalPages(parsed.totalPages);
       })
       .catch(() => {
-        if (!cancelled) setIdeasError('No se pudieron cargar las ideas aprobadas de la comunidad.');
+        if (!cancelled) setIdeasError('No se pudieron cargar los aportes aprobados de la comunidad.');
       })
       .finally(() => {
         if (!cancelled) setIdeasLoading(false);
@@ -94,8 +196,33 @@ const ParticipationSection = () => {
     return `${date.getDate()} de ${months[date.getMonth()]} de ${date.getFullYear()}`;
   };
 
+  const handleCategorySelect = (categoryValue) => {
+    setFormData(prev => ({ ...prev, category: categoryValue }));
+    if (categoryError) setCategoryError(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Client-side validation
+    if (!formData.category) {
+      setCategoryError(true);
+      toast.error('Por favor selecciona un tipo de participación');
+      return;
+    }
+    if (!formData.name.trim()) {
+      toast.error('El nombre es obligatorio');
+      return;
+    }
+    if (!formData.idea.trim()) {
+      toast.error('La idea o propuesta es obligatoria');
+      return;
+    }
+    if (showEthicalConcern && formData.ethicalConcern.trim() && formData.ethicalConcern.trim().length < 10) {
+      toast.error('La preocupación ética debe tener al menos 10 caracteres');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await api.post('/ideas', formData, { headers: { 'x-skip-auth': 'true' } });
@@ -110,7 +237,6 @@ const ParticipationSection = () => {
         setSubmitted(true);
       }
     } catch (err) {
-      // Try to extract backend messages
       const resp = err?.response?.data;
       if (resp && Array.isArray(resp.messages)) {
         resp.messages.forEach((m) => toast.error(m));
@@ -124,8 +250,13 @@ const ParticipationSection = () => {
   };
 
   const handleReset = () => {
-    setFormData({ name: '', idea: '', ethicalConcern: '' });
+    setFormData({ name: '', idea: '', ethicalConcern: '', category: '' });
     setSubmitted(false);
+    setCategoryError(false);
+  };
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -178,7 +309,7 @@ const ParticipationSection = () => {
                   <p className="text-3xl font-bold text-white leading-none">{ideasTotal}</p>
                 )}
                 <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider">
-                  {ideasTotal === 1 ? 'idea aprobada' : 'ideas aprobadas'}
+                  {ideasTotal === 1 ? 'aporte aprobado' : 'aportes aprobados'}
                 </p>
               </div>
             </div>
@@ -208,12 +339,12 @@ const ParticipationSection = () => {
           >
             <div className="flex items-center justify-between flex-wrap gap-2">
               <h3 className="text-2xl font-bold text-text-dark">
-                Ideas aprobadas de la comunidad
+                Aportes aprobados de la comunidad
               </h3>
               {ideasTotal > 0 && (
                 <span className="inline-flex items-center gap-2 text-sm text-text-medium bg-white px-3 py-1 rounded-full shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-green-500" />
-                  {ideasTotal} {ideasTotal === 1 ? 'idea aprobada' : 'ideas aprobadas'}
+                  {ideasTotal} {ideasTotal === 1 ? 'aporte aprobado' : 'aportes aprobados'}
                 </span>
               )}
             </div>
@@ -234,7 +365,7 @@ const ParticipationSection = () => {
 
             {!ideasLoading && !ideasError && ideas.length === 0 && (
               <div className="bg-white/60 border border-dashed border-gray-300 rounded-lg p-8 text-center text-text-medium">
-                Aún no hay ideas aprobadas de la comunidad. ¡Comparte la tuya!
+                Aún no hay aportes aprobados de la comunidad. ¡Comparte el tuyo!
               </div>
             )}
 
@@ -294,109 +425,232 @@ const ParticipationSection = () => {
           </motion.div>
 
           {!submitted ? (
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg space-y-4">
-              <h3 className="text-2xl font-bold text-text-dark">
-                Comparte tu idea con la comunidad
-              </h3>
-              <div>
-                <label htmlFor="participacion-nombre" className="block text-text-dark font-semibold mb-2">
-                  Nombre *
-                </label>
-                <input
-                  id="participacion-nombre"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Tu nombre o el de tu organización"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
-                  required
-                  aria-required="true"
-                  disabled={loading}
-                />
-              </div>
-              <div>
-                <label htmlFor="participacion-idea" className="block text-text-dark font-semibold mb-2">
-                  Idea o Propuesta *
-                </label>
-                <textarea
-                  id="participacion-idea"
-                  value={formData.idea}
-                  onChange={(e) => setFormData({ ...formData, idea: e.target.value })}
-                  placeholder="Describe tu propuesta para un uso ético y responsable de la IA"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
-                  rows="4"
-                  required
-                  aria-required="true"
-                  disabled={loading}
-                />
-              </div>
-              <div>
-                <label htmlFor="participacion-concern" className="block text-text-dark font-semibold mb-2">
-                  Preocupación Ética
-                </label>
-                <textarea
-                  id="participacion-concern"
-                  value={formData.ethicalConcern}
-                  onChange={(e) => setFormData({ ...formData, ethicalConcern: e.target.value })}
-                  placeholder="¿Algún riesgo o dilema ético que te gustaría señalar?"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
-                  rows="4"
-                  disabled={loading}
-                />
-                <p className="mt-1.5 text-xs text-text-medium">
-                  Opcional. Ayuda al Observatorio a identificar riesgos a vigilar.
-                </p>
-              </div>
-              <button
-                type="submit"
-                className="group inline-flex items-center justify-center gap-2 border-2 border-blue-700 text-blue-700 font-semibold tracking-wide px-10 py-3 rounded-lg transition-all duration-200 hover:bg-blue-700 hover:text-white hover:shadow-[0_8px_20px_-8px_rgba(29,78,216,0.5)] disabled:opacity-60 disabled:cursor-not-allowed"
-                disabled={loading}
+            <motion.form
+              onSubmit={handleSubmit}
+              className="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100 space-y-6"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <motion.div
+                className="space-y-5"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
               >
-                {loading ? <CircularProgress size={20} color="inherit" /> : (
-                  <>
-                    Enviar
-                    <svg
-                      className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-[3px]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
+                <h3 className="text-2xl font-bold text-text-dark">
+                  Comparte tu aporte con la comunidad
+                </h3>
+                <p className="text-text-medium text-sm">
+                  Todos los campos marcados con <span className="text-pink-500">*</span> son obligatorios
+                </p>
+
+                {/* Category Selector */}
+                <div className="space-y-3">
+                  <label className="block text-text-dark font-semibold">
+                    Tipo de participación <span className="text-pink-500">*</span>
+                  </label>
+                  {categoryError && (
+                    <motion.p
+                      className="text-sm text-red-600 flex items-center gap-1"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                  </>
-                )}
-              </button>
-            </form>
+                      <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 10-2 0v6a1 1 0 002 0V5z" clipRule="evenodd" />
+                      </svg>
+                      Selecciona un tipo de participación para continuar
+                    </motion.p>
+                  )}
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3" role="radiogroup" aria-label="Tipo de participación">
+                    {CATEGORIES.map((cat, idx) => (
+                      <CategoryCard
+                        key={cat.value}
+                        category={cat}
+                        isSelected={formData.category === cat.value}
+                        onClick={() => handleCategorySelect(cat.value)}
+                        index={idx}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Nombre */}
+                <div className="space-y-2">
+                  <label htmlFor="participacion-nombre" className="block text-text-dark font-semibold">
+                    Nombre <span className="text-pink-500">*</span>
+                  </label>
+                  <input
+                    id="participacion-nombre"
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => handleChange('name', e.target.value)}
+                    placeholder="Tu nombre o el de tu organización"
+                    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50"
+                    required
+                    aria-required="true"
+                    disabled={loading}
+                    autoComplete="name"
+                  />
+                </div>
+
+                {/* Idea - Dynamic label/placeholder based on category */}
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={selectedCategory?.value || 'default'}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-2"
+                  >
+                    <label htmlFor="participacion-idea" className="block text-text-dark font-semibold">
+                      {selectedCategory?.ideaLabel || 'Idea o Propuesta'} <span className="text-pink-500">*</span>
+                    </label>
+                    <textarea
+                      id="participacion-idea"
+                      value={formData.idea}
+                      onChange={(e) => handleChange('idea', e.target.value)}
+                      placeholder={selectedCategory?.ideaPlaceholder || 'Describe tu propuesta...'}
+                      className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 resize-none"
+                      rows="5"
+                      required
+                      aria-required="true"
+                      disabled={loading}
+                    />
+                    <p className="text-xs text-text-medium text-right">
+                      {formData.idea.length} / 5000 caracteres
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Preocupación Ética - Conditional */}
+                <AnimatePresence>
+                  {showEthicalConcern && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0, y: -10 }}
+                      animate={{ opacity: 1, height: 'auto', y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -10 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="space-y-2"
+                    >
+                      <label htmlFor="participacion-concern" className="block text-text-dark font-semibold flex items-center gap-2">
+                        Preocupación Ética
+                        <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-medium">
+                          Opcional
+                        </span>
+                      </label>
+                      <textarea
+                        id="participacion-concern"
+                        value={formData.ethicalConcern}
+                        onChange={(e) => handleChange('ethicalConcern', e.target.value)}
+                        placeholder="¿Algún riesgo, dilema ético o impacto social que te gustaría señalar?"
+                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors disabled:bg-gray-50 resize-none"
+                        rows="4"
+                        disabled={loading}
+                      />
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-text-medium flex items-center gap-1">
+                          <FaExclamationTriangle size={12} className="text-amber-500" />
+                          Solo para Funcionalidad y Sugerencia. Ayuda al Observatorio a identificar riesgos a vigilar.
+                        </p>
+                        <span className="text-xs text-text-medium">
+                          {formData.ethicalConcern.length} / 2000 caracteres
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Submit Button - Dynamic text based on category */}
+                <motion.button
+                  type="submit"
+                  className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 border-2 border-pink-600 text-pink-600 font-semibold tracking-wide px-10 py-3.5 rounded-xl transition-all duration-200 hover:bg-pink-600 hover:text-white hover:shadow-[0_8px_20px_-8px_rgba(219,39,119,0.5)] disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled={loading}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {loading ? (
+                    <CircularProgress size={22} color="inherit" />
+                  ) : (
+                    <>
+                      {selectedCategory?.submitText || 'Enviar aporte'}
+                      <motion.svg
+                        className="w-5 h-5"
+                        initial={{ x: 0 }}
+                        animate={{ x: 3 }}
+                        transition={{ duration: 0.3 }}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      </motion.svg>
+                    </>
+                  )}
+                </motion.button>
+              </motion.div>
+            </motion.form>
           ) : (
-            <div className="flex flex-col-reverse items-center gap-4">
-              <DotLottieReact
-                src={sendLottie}
-                autoplay
+            <motion.div
+              className="flex flex-col-reverse md:flex-row items-center gap-6"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div
                 style={{ width: '100%', maxWidth: 500 }}
-              />
-              <div className="max-w-md text-center space-y-3">
-                <h3 className="text-2xl font-semibold text-gray-900">
-                  ¡Idea enviada con éxito!
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <DotLottieReact
+                  src={sendLottie}
+                  autoplay
+                  style={{ width: '100%', maxWidth: 500 }}
+                />
+              </motion.div>
+              <motion.div
+                className="max-w-md text-center md:text-left space-y-4"
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  ¡Aporte enviado con éxito!
                 </h3>
                 <p className="text-base text-gray-600 leading-relaxed">
                   Gracias por tu participación. Tu aporte será revisado por el equipo del Observatorio.
                 </p>
-                <button
+                <motion.button
                   type="button"
                   onClick={handleReset}
-                  className="mt-4 inline-flex items-center gap-2 border-2 border-blue-700 text-blue-700 font-semibold tracking-wide px-6 py-2.5 rounded-lg transition-all duration-200 hover:bg-blue-700 hover:text-white"
+                  className="mt-2 inline-flex items-center gap-2 border-2 border-pink-600 text-pink-600 font-semibold tracking-wide px-6 py-2.5 rounded-xl transition-all duration-200 hover:bg-pink-600 hover:text-white"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  Enviar otra idea
-                </button>
-              </div>
-            </div>
+                  Enviar otro aporte
+                  <motion.svg
+                    className="w-4 h-4"
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </motion.svg>
+                </motion.button>
+              </motion.div>
+            </motion.div>
           )}
-          <ToastContainer position="top-right" autoClose={5000} />
+          <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
         </motion.div>
       </div>
     </section>
   );
 }
 
-export default ParticipationSection
+export default ParticipationSection;

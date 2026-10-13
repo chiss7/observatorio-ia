@@ -24,7 +24,6 @@ import {
   Activity,
   MapPin,
   TrendingUp,
-  Globe,
 } from "lucide-react";
 import AnimatedCounter from "./AnimatedCounter";
 import TimeSeriesCharts from "./metrics/TimeSeriesCharts";
@@ -322,51 +321,6 @@ export const MonitoringSection = () => {
                 </h3>
               </div>
               <InteractionCharts metricsData={metricsData} />
-            </motion.section>
-
-            {/* Insight editorial */}
-            <motion.section variants={itemVariants}>
-              <div className="relative overflow-hidden hairline-card rounded-3xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-rose-50/40" />
-                <div className="relative p-8 md:p-12 grid lg:grid-cols-[1fr_auto] gap-10 items-center">
-                  <div>
-                    <span className="inline-flex items-center gap-2 text-[11px] font-mono font-medium tracking-[0.25em] uppercase text-indigo-600 mb-5">
-                      <Globe size={14} />
-                      05 · Preparación Global
-                    </span>
-                    <h3 className="font-serif text-3xl md:text-4xl font-bold text-text-dark tracking-tight leading-tight">
-                      Ecuador ocupa el puesto{" "}
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-500">
-                        104 de 188
-                      </span>{" "}
-                      en preparación para IA
-                    </h3>
-                    <p className="text-text-medium mt-4 max-w-xl leading-relaxed">
-                      Según Oxford Insights (2024), esto refleja la necesidad de
-                      mejorar la infraestructura tecnológica y los marcos
-                      regulatorios para implementar IA en el sector público.
-                    </p>
-                    <a
-                      href="https://www.oxfordinsights.com/government-ai-readiness-index-2024"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition"
-                    >
-                      Fuente: Oxford Insights 2024
-                      <span aria-hidden="true">→</span>
-                    </a>
-                  </div>
-                  <div className="text-center shrink-0">
-                    <div className="font-mono text-6xl md:text-7xl font-bold text-indigo-600 tabular-nums leading-none">
-                      104
-                      <span className="text-slate-400 text-3xl md:text-4xl align-top"> / 188</span>
-                    </div>
-                    <div className="mt-3 text-[11px] uppercase tracking-[0.18em] text-text-medium">
-                      Government AI Readiness Index
-                    </div>
-                  </div>
-                </div>
-              </div>
             </motion.section>
           </motion.div>
         )}
