@@ -16,7 +16,8 @@ import AdminDashboard, {
 import Header from './components/Header';
 import KeepAlive from './components/KeepAlive';
 import Login from './components/Login';     
-import ProtectedRoute from './components/ProtectedRoute'; 
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminDigitalSphere from './components/AdminDigitalSphere';
 
 const PublicLayout = () => (
   <div className="font-sans flex flex-col min-h-dvh">
@@ -47,6 +48,7 @@ function App() {
             <Route path="publicaciones" element={<AdminDashboardPublications />} />
             <Route path="recursos" element={<AdminDashboardResources />} />
             <Route path="ideas" element={<AdminDashboardIdeas />} />
+            <Route path="esfera-digital" element={<AdminDigitalSphere />} />
           </Route>
         </Route>
       </Routes>
