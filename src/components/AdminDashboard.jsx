@@ -57,6 +57,7 @@ import {
   PictureAsPdf as PdfIcon,
   Link as LinkIcon,
   CloudDownload as CloudDownloadIcon,
+  Public as PublicIcon,
 } from '@mui/icons-material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -112,6 +113,7 @@ const SECTIONS = [
   { id: 'publicaciones', label: 'Publicaciones', icon: <ArticleIcon />, to: '/admin/publicaciones' },
   { id: 'recursos', label: 'Recursos', icon: <LibraryBooksIcon />, to: '/admin/recursos' },
   { id: 'ideas', label: 'Participación', icon: <LightbulbIcon />, to: '/admin/ideas' },
+  { id: 'esfera-digital', label: 'Esfera Digital', icon: <PublicIcon />, to: '/admin/esfera-digital' },
 ];
 
 const drawerItemSx = {
@@ -298,6 +300,15 @@ const AdminDashboardOverview = () => {
       icon: <LightbulbIcon />,
       bg: '#9d174d',
       gradient: 'linear-gradient(135deg, #9d174d 0%, #581c87 100%)',
+    },
+    {
+      title: 'Esfera Digital',
+      value: 'IA',
+      desc: 'Fuentes confiables y categorías',
+      to: '/admin/esfera-digital',
+      icon: <PublicIcon />,
+      bg: '#1e3a8a',
+      gradient: 'linear-gradient(135deg, #1e3a8a 0%, #0e7490 100%)',
     },
   ];
 
